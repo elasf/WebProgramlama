@@ -24,7 +24,8 @@ namespace odev1.Models
         [Phone] //???? salladım
         public int userTel { get; set; }
 
-
+        public string userAdres { get; set; }
+        public string password { get; set; }
         //password????
 
 
