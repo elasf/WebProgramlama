@@ -16,13 +16,10 @@ namespace odev1.Models
         [MinLength(2, ErrorMessage = "Soyisminiz 2 karakterden kısa olamaz.")]
         public string userSoyad { get; set; }
 
-        [Required]
-        [EmailAddress]
-        public string userMail { get; set; }
 
         [Required]
         [Phone] //???? salladım
-        public int userTel { get; set; }
+        public string userTel { get; set; }
 
 
         //password????
