@@ -107,6 +107,7 @@ namespace odev1.Areas.Identity.Pages.Account
 
                 user.userAd = Input.Ad;       
                 user.userSoyad = Input.Soyad;  
+
                 user.userTel = Input.Telefon;
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);

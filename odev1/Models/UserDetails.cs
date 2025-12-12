@@ -23,7 +23,9 @@ namespace odev1.Models
 
         public string userAdres { get; set; }
         public string password { get; set; }
-        //password????
+        
+
+        //PASSWORD 
 
 
     }
