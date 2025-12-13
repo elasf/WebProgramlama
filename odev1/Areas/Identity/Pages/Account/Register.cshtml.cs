@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using odev1.Models;
@@ -31,13 +32,16 @@ namespace odev1.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<UserDetails> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly RoleManager<IdentityRole> _roleManager; //yeni
 
         public RegisterModel(
             UserManager<UserDetails> userManager,
             IUserStore<UserDetails> userStore,
             SignInManager<UserDetails> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            RoleManager<IdentityRole> roleManager)
+
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -45,6 +49,7 @@ namespace odev1.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _roleManager = roleManager; //ataması yapıldı
         }
 
         [BindProperty]
@@ -106,9 +111,8 @@ namespace odev1.Areas.Identity.Pages.Account
                 var user = CreateUser();
 
                 user.userAd = Input.Ad;       
-                user.userSoyad = Input.Soyad;  
-
-                user.userTel = Input.Telefon;
+                user.userSoyad = Input.Soyad;
+                user.PhoneNumber = Input.Telefon;
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);

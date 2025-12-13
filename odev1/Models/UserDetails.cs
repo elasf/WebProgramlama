@@ -17,15 +17,12 @@ namespace odev1.Models
         public string userSoyad { get; set; }
 
 
-        [Required]
-        [Phone] //???? salladım
-        public string userTel { get; set; }
+       
 
-        public string userAdres { get; set; }
-        public string password { get; set; }
+        //adres sonra eklenebilir
         
 
-        //PASSWORD 
+        //şifre ve telefon kısmı silindi oto yapılıyor
         ///Password2
 
 

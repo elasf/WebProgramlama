@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace odev1.Migrations
 {
     /// <inheritdoc />
-    public partial class start : Migration
+    public partial class guncel : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -32,7 +32,6 @@ namespace odev1.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     userAd = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     userSoyad = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    userTel = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),

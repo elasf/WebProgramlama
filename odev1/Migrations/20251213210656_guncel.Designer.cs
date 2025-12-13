@@ -12,8 +12,8 @@ using odev1.Data;
 namespace odev1.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251211201529_start")]
-    partial class start
+    [Migration("20251213210656_guncel")]
+    partial class guncel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -223,10 +223,6 @@ namespace odev1.Migrations
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("userTel")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
