@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using odev1.Data;
@@ -11,9 +12,11 @@ using odev1.Data;
 namespace odev1.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251215221939_InitialPostgres")]
+    partial class InitialPostgres
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -152,50 +155,6 @@ namespace odev1.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("odev1.Models.Appointment", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
-
-                    b.Property<DateTime>("AppointmentDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("interval");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
-
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("interval");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("serviceId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("trainerId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("userId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("serviceId");
-
-                    b.HasIndex("trainerId");
-
-                    b.HasIndex("userId");
-
-                    b.ToTable("Appointments");
                 });
 
             modelBuilder.Entity("odev1.Models.Availability", b =>
@@ -440,33 +399,6 @@ namespace odev1.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("odev1.Models.Appointment", b =>
-                {
-                    b.HasOne("odev1.Models.Service", "service")
-                        .WithMany()
-                        .HasForeignKey("serviceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("odev1.Models.Trainer", "trainer")
-                        .WithMany("Appointments")
-                        .HasForeignKey("trainerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("odev1.Models.UserDetails", "user")
-                        .WithMany("Appointments")
-                        .HasForeignKey("userId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("service");
-
-                    b.Navigation("trainer");
-
-                    b.Navigation("user");
-                });
-
             modelBuilder.Entity("odev1.Models.Availability", b =>
                 {
                     b.HasOne("odev1.Models.Trainer", "trainer")
@@ -528,18 +460,11 @@ namespace odev1.Migrations
 
             modelBuilder.Entity("odev1.Models.Trainer", b =>
                 {
-                    b.Navigation("Appointments");
-
                     b.Navigation("availabilities");
 
                     b.Navigation("trainerExpertises");
 
                     b.Navigation("trainerServices");
-                });
-
-            modelBuilder.Entity("odev1.Models.UserDetails", b =>
-                {
-                    b.Navigation("Appointments");
                 });
 #pragma warning restore 612, 618
         }

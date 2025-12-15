@@ -16,11 +16,11 @@ namespace odev1.Models
         [MinLength(2, ErrorMessage = "Soyisminiz 2 karakterden kısa olamaz.")]
         public string userSoyad { get; set; }
 
+        public ICollection<Appointment> Appointments { get; set; }
 
-       
 
         //adres sonra eklenebilir
-        
+
 
         //şifre ve telefon kısmı silindi oto yapılıyor
         ///Password2
