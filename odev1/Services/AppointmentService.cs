@@ -37,7 +37,7 @@ namespace odev1.Services
         }
 
 
-        public Appointment UpdateAppointment(Appointment updated)
+        public Appointment update(Appointment updated)
         {
             var existing = _context.Appointments
                 .FirstOrDefault(a => a.id == updated.id);
@@ -58,7 +58,7 @@ namespace odev1.Services
             return existing;
         }
 
-        public void delete(int id)
+        public Appointment delete(int id)
         {
             var appointment = _context.Appointments
                 .FirstOrDefault(a => a.id == id);
@@ -68,6 +68,8 @@ namespace odev1.Services
 
             appointment.Status = AppointmentStatus.Cancelled;
             _context.SaveChanges();
+
+            return appointment;
 
         }
 
