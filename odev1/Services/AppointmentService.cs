@@ -10,6 +10,7 @@ namespace odev1.Services
         {
             _context = context;
         }
+
         //randevuOlusturabilirMi() ingilizcen yetmezse diye türkçeleri yazıyorum hadi iyisn 🤪
         public bool canCreateAppointment(Appointment appointment)
         {
@@ -22,21 +23,53 @@ namespace odev1.Services
         }
 
 
-        public bool CreateAppointment(Appointment appointment)
+        public Appointment create(Appointment appointment)
         {
-            if (!canCreateAppointment(appointment))
-                return false;
+            if (canCreateAppointment(appointment))
+                throw new Exception("Trainer is not available.");
 
             appointment.Status = AppointmentStatus.Pending;
 
             _context.Appointments.Add(appointment);
             _context.SaveChanges();
 
-            return true;
+            return appointment;
         }
 
 
+        public Appointment UpdateAppointment(Appointment updated)
+        {
+            var existing = _context.Appointments
+                .FirstOrDefault(a => a.id == updated.id);
 
+            if (existing == null)
+                throw new KeyNotFoundException("Appointment not found.");
+
+            if (!canCreateAppointment(updated))
+                throw new InvalidOperationException("Updated appointment is not valid.");
+
+            existing.trainerId = updated.trainerId;
+            existing.serviceId = updated.serviceId;
+            existing.AppointmentDate = updated.AppointmentDate;
+            existing.StartTime = updated.StartTime;
+            existing.EndTime = updated.EndTime;
+
+            _context.SaveChanges();
+            return existing;
+        }
+
+        public void delete(int id)
+        {
+            var appointment = _context.Appointments
+                .FirstOrDefault(a => a.id == id);
+
+            if (appointment == null)
+                throw new KeyNotFoundException("Appointment not found.");
+
+            appointment.Status = AppointmentStatus.Cancelled;
+            _context.SaveChanges();
+
+        }
 
         //--------------------------------------------------
         //Bunlar daha çok yardımcı fonksiyonlar 
