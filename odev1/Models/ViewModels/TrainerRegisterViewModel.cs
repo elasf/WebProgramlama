@@ -1,8 +1,12 @@
-﻿namespace odev1.Models.ViewModels
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace odev1.Models.ViewModels
 {
     public class TrainerRegisterViewModel
     {
         // admin kaydederken bunları girecek
+
+        [EmailAddress]
         public string email { get; set; }
         public string password { get; set; }
         public string firstName { get; set; }

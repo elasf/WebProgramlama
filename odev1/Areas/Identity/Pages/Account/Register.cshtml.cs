@@ -2,14 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -19,7 +11,16 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using odev1.Data;
 using odev1.Models;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace odev1.Areas.Identity.Pages.Account
 {
@@ -33,6 +34,7 @@ namespace odev1.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly RoleManager<IdentityRole> _roleManager; //yeni
+        private readonly ApplicationDbContext _context; 
 
         public RegisterModel(
             UserManager<UserDetails> userManager,
@@ -40,7 +42,8 @@ namespace odev1.Areas.Identity.Pages.Account
             SignInManager<UserDetails> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            odev1.Data.ApplicationDbContext context)
 
         {
             _userManager = userManager;
@@ -50,6 +53,7 @@ namespace odev1.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _roleManager = roleManager; //ataması yapıldı
+            _context = context;
         }
 
         [BindProperty]
@@ -125,6 +129,18 @@ namespace odev1.Areas.Identity.Pages.Account
 
                     // rol atama işlemi (kullanıcı oluştuğu an)
                     await _userManager.AddToRoleAsync(user, "user");
+
+                    //user ve member olarak kayıt yapacak, admin panelinde üyeleri listele kısmı için
+                    var newMember = new odev1.Models.Member 
+                    {
+                        UserId = user.Id,
+                        FullName = $"{Input.Ad} {Input.Soyad}", 
+                        KayitTarihi = DateTime.Now,
+                        //boy kilo eklenebilir
+                    };
+
+                    _context.Members.Add(newMember);
+                    await _context.SaveChangesAsync();  
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

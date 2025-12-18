@@ -23,6 +23,7 @@ namespace odev1.Data
         public DbSet<TrainerExpertise> TrainerExpertises { get; set; }
         public DbSet<TrainerService> TrainerServices { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
+        public DbSet<Member> Members { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

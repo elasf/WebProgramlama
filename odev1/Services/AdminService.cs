@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using odev1.Data;
 using odev1.Models;
 using odev1.Models.ViewModels;
@@ -26,6 +27,7 @@ namespace odev1.Services
 
             var user = new UserDetails
             {
+                UserName = model.email,
                 Email = model.email,
                 userAd = model.firstName,
                 userSoyad = model.lastName,
@@ -46,8 +48,13 @@ namespace odev1.Services
             return IdentityResult.Success;
         }
 
-        // --------------------------------------------------
-        // Yardımcı Fonksiyonlar (Private Helpers)
+        public List<Member> getAllMembers()
+        {
+            
+            return _context.Members
+                           .Include(m => m.User)
+                           .ToList();
+        }
 
         private bool UserExists(string email)
         {

@@ -20,6 +20,12 @@ namespace odev1.Controllers
             return View();
         }
 
+        public IActionResult MemberList() 
+        {
+            var members = _adminService.getAllMembers();
+            return View(members);
+        }
+
         [HttpGet]
         public IActionResult createTrainer()
         {
