@@ -10,9 +10,9 @@ namespace odev1.Data
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
-            // 🔴 appsettings.json YOK
-            // 🔴 configuration YOK
-            // ✅ direkt connection string
+            // appsettings.json YOK
+            // configuration YOK
+            // direkt connection string
 
             optionsBuilder.UseNpgsql(
                 "Host=localhost;Port=5432;Database=odev1db;Username=postgres;Password=1905"

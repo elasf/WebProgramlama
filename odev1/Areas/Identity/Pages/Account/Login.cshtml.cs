@@ -23,10 +23,14 @@ namespace odev1.Areas.Identity.Pages.Account
         private readonly SignInManager<UserDetails> _signInManager;
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(SignInManager<UserDetails> signInManager, ILogger<LoginModel> logger)
+        private readonly UserManager<UserDetails> _userManager;
+
+        public LoginModel(SignInManager<UserDetails> signInManager, ILogger<LoginModel> logger,UserManager<UserDetails> userManager)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _userManager = userManager;
+            
         }
 
         /// <summary>
@@ -115,6 +119,22 @@ namespace odev1.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
+                    var user = await _userManager.FindByEmailAsync(Input.Email);
+                    var roles = await _userManager.GetRolesAsync(user);
+
+                    if (roles.Contains("admin"))
+                    {
+                        return RedirectToAction("Index", "Admin"); // admin paneli
+                    }
+                    else if (roles.Contains("trainer"))
+                    {
+                        return RedirectToAction("Index", "Trainer"); // antrenör paneli
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index", "Home"); //normal üye ana sayfaya
+                    }
+
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }

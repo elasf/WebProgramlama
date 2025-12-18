@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using odev1.Data;
 using odev1.Models;
+using odev1.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,10 @@ builder.Services.AddDefaultIdentity<UserDetails>(options => options.SignIn.Requi
     .AddRoles<IdentityRole>()     //ROL SERVÝSÝ AKTÝF
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<AdminService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<AppointmentService>();   
 
 var app = builder.Build();
 

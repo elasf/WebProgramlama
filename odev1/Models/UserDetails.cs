@@ -23,7 +23,6 @@ namespace odev1.Models
 
 
         //şifre ve telefon kısmı silindi oto yapılıyor
-        ///Password2
 
 
     }
