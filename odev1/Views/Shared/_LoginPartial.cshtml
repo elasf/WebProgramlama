@@ -1,12 +1,28 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using odev1.Models;
 @inject SignInManager<UserDetails> SignInManager
 @inject UserManager<UserDetails> UserManager
+
+@{
+    string isim = User.Identity?.Name; 
+
+    if (SignInManager.IsSignedIn(User))
+    {
+      
+        var user = await UserManager.GetUserAsync(User);
+        if (user != null)
+        {
+          
+            isim = $"{user.userAd}";
+        }
+    }
+}
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
     <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
+        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @isim!</a>
     </li>
     <li class="nav-item">
         <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
