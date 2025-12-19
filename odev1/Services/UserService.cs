@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Packaging.Signing;
 using odev1.Models;
 
 namespace odev1.Services
 {
 
-    public class UserService
+    public class UserService : IUserService
     {
         private readonly UserManager<UserDetails> _userManager;
 
@@ -33,7 +32,7 @@ namespace odev1.Services
             var user = await _userManager.FindByEmailAsync(email);
 
             if (user == null)
-                throw new KeyNotFoundException("email not founf");
+                throw new KeyNotFoundException("email not found");
 
             return user;
         }

@@ -30,10 +30,11 @@ namespace odev1.Controllers
 
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Service service)
         {
             ModelState.Remove("trainerService");
-            ModelState.Remove("trainerServices"); //sadece servis ekliyorum hocasını henüz atamadım!!!
+            //ModelState.Remove("trainerServices"); //sadece servis ekliyorum hocasını henüz atamadım!!!
 
             if (ModelState.IsValid)
             {
@@ -44,26 +45,32 @@ namespace odev1.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit()
+        public async Task<IActionResult> Edit(int id)
         {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Edit(Service service)
-        {
-            if (ModelState.IsValid)
-            {
-                await _adminService.UpdateServiceAsync(service);
-                return RedirectToAction(nameof(listServices));
-            }
+            var service = await _adminService.GetServiceByIdAsync(id);
+            if (service == null) return NotFound();
             return View(service);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Service service)
+        {
+            if (id != service.id) return BadRequest();
+            if (!ModelState.IsValid) return View(service);
 
+            await _adminService.UpdateServiceAsync(service);
+            TempData["success"] = "Hizmet güncellendi.";
+            return RedirectToAction(nameof(listServices));
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             await _adminService.DeleteServiceAsync(id);
+            TempData["success"] = "Hizmet silindi.";
             return RedirectToAction(nameof(listServices));
         }
     }
