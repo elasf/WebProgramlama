@@ -8,7 +8,7 @@ namespace odev1.Models
 
         public int id { get; set; }
         public string name { get; set; }
-        public int duraiton { get; set; }
+        public int duraiton { get; set; } //ingilizce yazıp hava atıcam diye yanlış yazmışsın ibret olsun diye bırakıyorum
 
         public decimal price { get; set; }
 

@@ -45,7 +45,7 @@ namespace odev1.Controllers
             if (result.Succeeded)
             {
                 TempData["success"] = "Antrenör sisteme eklendi.";
-                return RedirectToAction("Index");
+                return RedirectToAction("createTrainer");
             }
 
             foreach (var error in result.Errors)
