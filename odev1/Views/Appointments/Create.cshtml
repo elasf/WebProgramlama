@@ -1,81 +1,188 @@
 @model odev1.ViewModels.AppointmentCreateViewModel
+
 @{
-    ViewData["Title"] = "Randevu Al";
+    ViewData["Title"] = "Randevu Planla - LionGym";
 }
 
-<h2>Randevu Al</h2>
-<hr />
-<form asp-action="Create" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
 
-    <div class="mb-3">
-        <label asp-for="ServiceId" class="form-label">Hizmet seçiniz</label>
-        <select asp-for="ServiceId" class="form-select" id="serviceSelect">
-            <option value="">Hizmetler</option>
-            @foreach (var s in Model.Services)
-            {
-                <option value="@s.Value" selected="@(Model.ServiceId?.ToString()==s.Value ? "selected" : null)">@s.Text</option>
-            }
-        </select>
-        <span asp-validation-for="ServiceId" class="text-danger"></span>
+    .booking-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        background: white;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #444;
+        margin-bottom: 8px;
+    }
+
+    .custom-input {
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        padding: 12px;
+    }
+
+    /* Saat Slotları Stili */
+    .slot-wrapper {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 10px;
+    }
+
+    .slot-box {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 2px solid #eee;
+        border-radius: 12px;
+        text-align: center;
+        padding: 12px 5px;
+        background: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+        .slot-box:hover:not(.disabled) {
+            border-color: #ff6b00;
+            color: #ff6b00;
+            transform: translateY(-2px);
+        }
+
+        .slot-box.active {
+            background: #ff6b00;
+            color: white;
+            border-color: #ff6b00;
+            box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);
+        }
+
+        .slot-box.disabled {
+            background: #f1f1f1;
+            color: #bbb;
+            cursor: not-allowed;
+            text-decoration: line-through;
+            border-color: #eee;
+        }
+
+    .btn-lion {
+        background-color: #ff6b00;
+        color: white;
+        border-radius: 10px;
+        padding: 15px 40px;
+        font-weight: bold;
+        border: none;
+        transition: all 0.3s;
+    }
+
+        .btn-lion:hover:not(:disabled) {
+            background-color: #e65100;
+            color: white;
+            transform: scale(1.02);
+        }
+
+        .btn-lion:disabled {
+            background-color: #ccc;
+        }
+</style>
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Antrenmanını Planla</h2>
+        <p class="text-muted">Eğitmenini ve saatini seç, hedefine odaklan.</p>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="TrainerId" class="form-label">Eğitmen seçiniz</label>
-        <select asp-for="TrainerId" class="form-select" id="trainerSelect">
-            <option value="">Eğitmenler</option>
-            @foreach (var t in Model.Trainers)
-            {
-                <option value="@t.Value">@t.Text</option>
-            }
-        </select>
-        <span asp-validation-for="TrainerId" class="text-danger"></span>
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card booking-card p-4 p-md-5">
+                <form asp-action="Create" id="appointmentForm">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="row g-4">
+                        <div class="col-md-5">
+                            <div class="mb-4">
+                                <label class="form-label"><i class="fas fa-dumbbell me-2"></i>Hizmet Türü</label>
+                                <select asp-for="ServiceId" asp-items="Model.Services" class="form-select custom-input" id="serviceSelect">
+                                    <option value="">Seçiniz...</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label"><i class="fas fa-user-tie me-2"></i>Eğitmen</label>
+                                <select asp-for="TrainerId" asp-items="Model.Trainers" class="form-select custom-input" id="trainerSelect">
+                                    <option value="">Eğitmen seçiniz...</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label"><i class="fas fa-calendar-alt me-2"></i>Tarih</label>
+                                <input asp-for="AppointmentDate" type="date" class="form-control custom-input" id="dateInput" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-7 border-start-md ps-md-5">
+                            <label class="form-label d-block mb-3"><i class="fas fa-clock me-2"></i>Müsait Saatler</label>
+
+                            <div id="slotsContainer" class="slot-wrapper">
+                                <div class="text-center text-muted w-100 py-4">
+                                    <p class="small">Lütfen yukarıdaki bilgileri tamamlayın.</p>
+                                </div>
+                            </div>
+
+                            <input type="hidden" asp-for="StartTime" id="selectedStartTime" />
+                            <span asp-validation-for="StartTime" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-5 border-top pt-4">
+                        <button type="submit" class="btn btn-lion shadow-sm" id="submitBtn" disabled>
+                            RANDEVUYU ONAYLA
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="row">
-        <div class="col-md-4 mb-3">
-            <label asp-for="AppointmentDate" class="form-label">Randevu tarihi</label>
-            <input asp-for="AppointmentDate" class="form-control" type="date" />
-            <span asp-validation-for="AppointmentDate" class="text-danger"></span>
-        </div>
-        <div class="col-md-4 mb-3">
-            <label asp-for="StartTime" class="form-label">Başlangıç saati</label>
-            <input asp-for="StartTime" class="form-control" type="time" />
-            <span asp-validation-for="StartTime" class="text-danger"></span>
-        </div>
-        <div class="col-md-4 mb-3">
-            <label class="form-label">Ücret</label>
-            <input class="form-control" value="@(Model.Price?.ToString("C"))" readonly />
-        </div>
-    </div>
-
-    <button class="btn btn-primary" type="submit">Randevu Oluştur</button>
-    <a asp-action="My" class="btn btn-outline-secondary">Randevularım</a>
-
-    @Html.AntiForgeryToken()
-</form>
-
-@section Scripts{
-    <partial name="_ValidationScriptsPartial" />
+@section Scripts {
     <script>
-        const serviceSelect = document.getElementById('serviceSelect');
-        const trainerSelect = document.getElementById('trainerSelect');
-        serviceSelect.addEventListener('change', async (e) => {
-            const serviceId = e.target.value;
-            trainerSelect.innerHTML = '<option value=\"\">— Yükleniyor —</option>';
-            if (!serviceId) {
-                trainerSelect.innerHTML = '<option value=\"\">— Eğitmen Seçin —</option>';
-                return;
+        $('#serviceSelect, #trainerSelect, #dateInput').on('change', function () {
+            const sId = $('#serviceSelect').val();
+            const tId = $('#trainerSelect').val();
+            const date = $('#dateInput').val();
+
+            if (sId && tId && date) {
+                loadSlots(sId, tId, date);
             }
-            const res = await fetch(`/Appointments/TrainersForService?serviceId=${serviceId}`);
-            const data = await res.json();
-            trainerSelect.innerHTML = '<option value=\"\">— Eğitmen Seçin —</option>';
-            data.forEach(x => {
-                const opt = document.createElement('option');
-                opt.value = x.value; opt.textContent = x.text;
-                trainerSelect.appendChild(opt);
-            });
         });
+
+        function loadSlots(sId, tId, date) {
+            $('#slotsContainer').html('<div class="text-center w-100"><div class="spinner-border text-warning" role="status"></div></div>');
+
+            $.get(`/Appointments/GetAvailableSlotsJson?serviceId=${sId}&trainerId=${tId}&date=${date}`, function (data) {
+                let html = '';
+                if (data.length === 0) {
+                    html = '<div class="alert alert-light w-100 text-center small">Üzgünüz, bu kriterlerde uygun saat bulunamadı.</div>';
+                } else {
+                    data.forEach(slot => {
+                        const statusClass = slot.isAvailable ? '' : 'disabled';
+                        html += `<div class="slot-box ${statusClass}" onclick="selectSlot(this, '${slot.startTime}')">${slot.startTime.substring(0, 5)}</div>`;
+                    });
+                }
+                $('#slotsContainer').html(html);
+            });
+        }
+
+        function selectSlot(element, time) {
+            if ($(element).hasClass('disabled')) return;
+            $('.slot-box').removeClass('active');
+            $(element).addClass('active');
+            $('#selectedStartTime').val(time);
+            $('#submitBtn').prop('disabled', false);
+        }
     </script>
 }
-

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace odev1.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialPostgres : Migration
+    public partial class yeni : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -72,26 +72,13 @@ namespace odev1.Migrations
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    name = table.Column<string>(type: "text", nullable: false),
-                    duraiton = table.Column<int>(type: "integer", nullable: false),
+                    name = table.Column<string>(type: "character varying(60)", maxLength: 60, nullable: false),
+                    duration = table.Column<int>(type: "integer", nullable: false),
                     price = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Services", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Trainers",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    fullName = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Trainers", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -201,14 +188,150 @@ namespace odev1.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Members",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    FullName = table.Column<string>(type: "text", nullable: false),
+                    KayitTarihi = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Members", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Members_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProgressEntries",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    userId = table.Column<string>(type: "text", nullable: false),
+                    date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    weightKg = table.Column<decimal>(type: "numeric", nullable: false),
+                    bodyFatPercent = table.Column<decimal>(type: "numeric", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProgressEntries", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_ProgressEntries_AspNetUsers_userId",
+                        column: x => x.userId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Trainers",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    fullName = table.Column<string>(type: "text", nullable: false),
+                    userId = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Trainers", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Trainers_AspNetUsers_userId",
+                        column: x => x.userId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AIRecommendations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    MemberId = table.Column<int>(type: "integer", nullable: true),
+                    Height = table.Column<decimal>(type: "numeric", nullable: true),
+                    Weight = table.Column<decimal>(type: "numeric", nullable: true),
+                    BodyType = table.Column<string>(type: "text", nullable: true),
+                    Goal = table.Column<string>(type: "text", nullable: true),
+                    PhotoPath = table.Column<string>(type: "text", nullable: true),
+                    ExerciseRecommendations = table.Column<string>(type: "text", nullable: true),
+                    DietRecommendations = table.Column<string>(type: "text", nullable: true),
+                    GeneralAdvice = table.Column<string>(type: "text", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AIRecommendations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AIRecommendations_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AIRecommendations_Members_MemberId",
+                        column: x => x.MemberId,
+                        principalTable: "Members",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Appointments",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    userId = table.Column<string>(type: "text", nullable: false),
+                    trainerId = table.Column<int>(type: "integer", nullable: false),
+                    serviceId = table.Column<int>(type: "integer", nullable: false),
+                    AppointmentDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    StartTime = table.Column<TimeSpan>(type: "interval", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "interval", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Appointments", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Appointments_AspNetUsers_userId",
+                        column: x => x.userId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Appointments_Services_serviceId",
+                        column: x => x.serviceId,
+                        principalTable: "Services",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Appointments_Trainers_trainerId",
+                        column: x => x.trainerId,
+                        principalTable: "Trainers",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Availabilities",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    tarinerId = table.Column<int>(type: "integer", nullable: false),
-                    trainerid = table.Column<int>(type: "integer", nullable: false),
-                    date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    trainerId = table.Column<int>(type: "integer", nullable: false),
+                    date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     startTime = table.Column<TimeSpan>(type: "interval", nullable: false),
                     endTime = table.Column<TimeSpan>(type: "interval", nullable: false)
                 },
@@ -216,8 +339,8 @@ namespace odev1.Migrations
                 {
                     table.PrimaryKey("PK_Availabilities", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Availabilities_Trainers_trainerid",
-                        column: x => x.trainerid,
+                        name: "FK_Availabilities_Trainers_trainerId",
+                        column: x => x.trainerId,
                         principalTable: "Trainers",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -272,6 +395,31 @@ namespace odev1.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_AIRecommendations_MemberId",
+                table: "AIRecommendations",
+                column: "MemberId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AIRecommendations_UserId",
+                table: "AIRecommendations",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_serviceId",
+                table: "Appointments",
+                column: "serviceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_trainerId",
+                table: "Appointments",
+                column: "trainerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_userId",
+                table: "Appointments",
+                column: "userId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
@@ -309,14 +457,29 @@ namespace odev1.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Availabilities_trainerid",
+                name: "IX_Availabilities_trainerId",
                 table: "Availabilities",
-                column: "trainerid");
+                column: "trainerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Members_UserId",
+                table: "Members",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProgressEntries_userId",
+                table: "ProgressEntries",
+                column: "userId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TrainerExpertises_expertiseId",
                 table: "TrainerExpertises",
                 column: "expertiseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Trainers_userId",
+                table: "Trainers",
+                column: "userId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TrainerServices_serviceId",
@@ -327,6 +490,12 @@ namespace odev1.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AIRecommendations");
+
+            migrationBuilder.DropTable(
+                name: "Appointments");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -346,16 +515,19 @@ namespace odev1.Migrations
                 name: "Availabilities");
 
             migrationBuilder.DropTable(
+                name: "ProgressEntries");
+
+            migrationBuilder.DropTable(
                 name: "TrainerExpertises");
 
             migrationBuilder.DropTable(
                 name: "TrainerServices");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoles");
+                name: "Members");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Expertises");
@@ -365,6 +537,9 @@ namespace odev1.Migrations
 
             migrationBuilder.DropTable(
                 name: "Trainers");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

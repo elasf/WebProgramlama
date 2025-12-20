@@ -382,6 +382,18 @@ namespace odev1.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
 
+                    b.Property<TimeSpan>("WeekdayEnd")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("WeekdayStart")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("WeekendEnd")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("WeekendStart")
+                        .HasColumnType("interval");
+
                     b.Property<string>("fullName")
                         .IsRequired()
                         .HasColumnType("text");

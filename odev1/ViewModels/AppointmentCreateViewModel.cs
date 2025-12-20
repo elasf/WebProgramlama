@@ -23,6 +23,8 @@ namespace odev1.ViewModels
         // Dropdown listeleri için
         public IEnumerable<SelectListItem> Services { get; set; } = Enumerable.Empty<SelectListItem>();
         public IEnumerable<SelectListItem> Trainers { get; set; } = Enumerable.Empty<SelectListItem>();
+
+        public List<SlotItemViewModel> AvailableSlots { get; set; } = new List<SlotItemViewModel>();
     }
 }
 

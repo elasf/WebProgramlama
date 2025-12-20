@@ -23,6 +23,11 @@ namespace odev1.Models
 
         public ICollection<Appointment> Appointments { get; set; }
 
+        public TimeSpan WeekdayStart { get; set; } = new TimeSpan(9, 0, 0);  // 09:00
+        public TimeSpan WeekdayEnd { get; set; } = new TimeSpan(21, 0, 0);    // 21:00
+        public TimeSpan WeekendStart { get; set; } = new TimeSpan(10, 0, 0); // 10:00
+        public TimeSpan WeekendEnd { get; set; } = new TimeSpan(17, 0, 0);
+
     }
 
 

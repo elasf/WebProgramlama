@@ -12,8 +12,8 @@ using odev1.Data;
 namespace odev1.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251218163411_membereklendi")]
-    partial class membereklendi
+    [Migration("20251220153049_yeni")]
+    partial class yeni
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -157,6 +157,60 @@ namespace odev1.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("odev1.Models.AIRecommendation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BodyType")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("DietRecommendations")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ExerciseRecommendations")
+                        .HasColumnType("text");
+
+                    b.Property<string>("GeneralAdvice")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Goal")
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("Height")
+                        .HasColumnType("numeric");
+
+                    b.Property<int?>("MemberId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PhotoPath")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("Weight")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MemberId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AIRecommendations");
+                });
+
             modelBuilder.Entity("odev1.Models.Appointment", b =>
                 {
                     b.Property<int>("id")
@@ -166,7 +220,7 @@ namespace odev1.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
 
                     b.Property<DateTime>("AppointmentDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("interval");
@@ -210,7 +264,7 @@ namespace odev1.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
 
                     b.Property<DateTime>("date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<TimeSpan>("endTime")
                         .HasColumnType("interval");
@@ -218,15 +272,12 @@ namespace odev1.Migrations
                     b.Property<TimeSpan>("startTime")
                         .HasColumnType("interval");
 
-                    b.Property<int>("tarinerId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("trainerid")
+                    b.Property<int>("trainerId")
                         .HasColumnType("integer");
 
                     b.HasKey("id");
 
-                    b.HasIndex("trainerid");
+                    b.HasIndex("trainerId");
 
                     b.ToTable("Availabilities");
                 });
@@ -261,7 +312,7 @@ namespace odev1.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("KayitTarihi")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -274,6 +325,34 @@ namespace odev1.Migrations
                     b.ToTable("Members");
                 });
 
+            modelBuilder.Entity("odev1.Models.ProgressEntry", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
+
+                    b.Property<decimal?>("bodyFatPercent")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("date")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("userId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("weightKg")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("userId");
+
+                    b.ToTable("ProgressEntries");
+                });
+
             modelBuilder.Entity("odev1.Models.Service", b =>
                 {
                     b.Property<int>("id")
@@ -282,12 +361,13 @@ namespace odev1.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
 
-                    b.Property<int>("duraiton")
+                    b.Property<int>("duration")
                         .HasColumnType("integer");
 
                     b.Property<string>("name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)");
 
                     b.Property<decimal>("price")
                         .HasColumnType("numeric");
@@ -314,6 +394,8 @@ namespace odev1.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("id");
+
+                    b.HasIndex("userId");
 
                     b.ToTable("Trainers");
                 });
@@ -473,6 +555,24 @@ namespace odev1.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("odev1.Models.AIRecommendation", b =>
+                {
+                    b.HasOne("odev1.Models.Member", "Member")
+                        .WithMany("AIRecommendations")
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("odev1.Models.UserDetails", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Member");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("odev1.Models.Appointment", b =>
                 {
                     b.HasOne("odev1.Models.Service", "service")
@@ -504,7 +604,7 @@ namespace odev1.Migrations
                 {
                     b.HasOne("odev1.Models.Trainer", "trainer")
                         .WithMany("availabilities")
-                        .HasForeignKey("trainerid")
+                        .HasForeignKey("trainerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -516,6 +616,28 @@ namespace odev1.Migrations
                     b.HasOne("odev1.Models.UserDetails", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("odev1.Models.ProgressEntry", b =>
+                {
+                    b.HasOne("odev1.Models.UserDetails", "user")
+                        .WithMany()
+                        .HasForeignKey("userId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("user");
+                });
+
+            modelBuilder.Entity("odev1.Models.Trainer", b =>
+                {
+                    b.HasOne("odev1.Models.UserDetails", "User")
+                        .WithMany()
+                        .HasForeignKey("userId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -563,6 +685,11 @@ namespace odev1.Migrations
             modelBuilder.Entity("odev1.Models.Expertise", b =>
                 {
                     b.Navigation("trainerExpertise");
+                });
+
+            modelBuilder.Entity("odev1.Models.Member", b =>
+                {
+                    b.Navigation("AIRecommendations");
                 });
 
             modelBuilder.Entity("odev1.Models.Service", b =>

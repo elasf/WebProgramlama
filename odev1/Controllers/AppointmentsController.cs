@@ -307,7 +307,7 @@ namespace odev1.Controllers
             return RedirectToAction(nameof(My));
         }
 
-        // AJAX: Seçilen hizmete göre eğitmenleri getir
+
         [HttpGet]
         public async Task<IActionResult> TrainersForService(int serviceId)
         {
@@ -323,6 +323,57 @@ namespace odev1.Controllers
 
             return Json(trainers);
         }
+        
+        [HttpGet]
+        [Route("Appointments/GetAvailableSlotsJson")]
+        public async Task<List<SlotItemViewModel>> GetAvailableSlots(int trainerId, int serviceId, DateTime date)
+        {
+            var trainer = await _context.Trainers.FindAsync(trainerId);
+            var service = await _context.Services.FindAsync(serviceId);
+            var slots = new List<SlotItemViewModel>();
+
+            if (trainer == null || service == null) return slots;
+
+           
+            bool isWeekend = (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday);
+            TimeSpan workStart = isWeekend ? trainer.WeekendStart : trainer.WeekdayStart;
+            TimeSpan workEnd = isWeekend ? trainer.WeekendEnd : trainer.WeekdayEnd;
+
+            
+            var busyAppointments = await _context.Appointments
+                .Where(a => a.trainerId == trainerId && a.AppointmentDate.Date == date.Date && a.Status != odev1.Models.AppointmentStatus.Cancelled)
+                .Select(a => new { a.StartTime, a.EndTime })
+                .ToListAsync();
+
+            
+            var currentTime = workStart;
+            while (currentTime.Add(TimeSpan.FromMinutes(service.duration)) <= workEnd)
+            {
+                var slotEnd = currentTime.Add(TimeSpan.FromMinutes(service.duration));
+
+                
+                bool isBusy = busyAppointments.Any(a =>
+                    (currentTime < a.EndTime && slotEnd > a.StartTime));
+
+                
+                if (date.Date == DateTime.Today && currentTime < DateTime.Now.TimeOfDay)
+                {
+                    isBusy = true;
+                }
+
+                slots.Add(new SlotItemViewModel
+                {
+                    StartTime = currentTime,
+                    IsAvailable = !isBusy
+                });
+
+                
+                currentTime = currentTime.Add(TimeSpan.FromMinutes(60));
+            }
+
+            return slots;
+        }
+
 
         // Yardımcı: Hizmete uygun eğitmen dropdown
         private async Task<IEnumerable<SelectListItem>> TrainersSelectListForService(int serviceId)

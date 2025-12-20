@@ -93,20 +93,23 @@ namespace odev1.Services
         }
 
         //trainer müsait  mi 
-        private bool isWithinTrainerAvailability(
-            int trainerId,
-            DateTime date,
-            TimeSpan startTime,
-            TimeSpan endTime)
+        private bool isWithinTrainerAvailability(int trainerId, DateTime date, TimeSpan startTime, TimeSpan endTime)
         {
-            //BUnlardan biri bile yanlış çıkarsa trainer müsait değil abla.
-            //Şimdilik baya basit ileride canımız sıkılırsa geliştiririz.
-            return _context.Availabilities.Any(a =>
-            a.trainerId == trainerId &&
-            a.date.Date == date.Date &&
-            startTime >= a.startTime &&
-            endTime <= a.endTime);
+            var trainer = _context.Trainers.Find(trainerId);
+            if (trainer == null) return false;
 
+            bool isWeekend = (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday);
+
+            // Hafta sonu veya hafta içi için sınırları belirle
+            TimeSpan startLimit = isWeekend ? trainer.WeekendStart : trainer.WeekdayStart;
+            TimeSpan endLimit = isWeekend ? trainer.WeekendEnd : trainer.WeekdayEnd;
+
+            // 1. Randevu hocanın mesai saatleri içinde mi?
+            // 2. Geçmiş bir saate randevu alınmaya çalışılıyor mu? (Bugün için kontrol)
+            if (date.Date == DateTime.Today && startTime < DateTime.Now.TimeOfDay)
+                return false;
+
+            return startTime >= startLimit && endTime <= endLimit;
         }
 
         private bool hasAppointmentConflict(
