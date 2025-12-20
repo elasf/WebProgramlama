@@ -1,43 +1,128 @@
 @model odev1.ViewModels.ProfileViewModel
 @{
-    ViewData["Title"] = "Profilim";
+    ViewData["Title"] = "Profilim - LionGym";
 }
 
-<h2>Profilimi Düzenle</h2>
-<hr />
-@if (TempData["success"] != null)
-{
-    <div class="alert alert-success">@TempData["success"]</div>
-}
+<style>
+    body {
+        background-color: #ffffff;
+        color: #333;
+    }
 
-<form asp-action="Profile" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    .profile-container {
+        max-width: 600px;
+        margin-top: 50px;
+    }
 
-    <div class="row">
-        <div class="col-md-4 mb-3">
-            <label asp-for="FirstName" class="form-label"></label>
-            <input asp-for="FirstName" class="form-control" />
-            <span asp-validation-for="FirstName" class="text-danger"></span>
-        </div>
-        <div class="col-md-4 mb-3">
-            <label asp-for="LastName" class="form-label"></label>
-            <input asp-for="LastName" class="form-control" />
-            <span asp-validation-for="LastName" class="text-danger"></span>
-        </div>
-        <div class="col-md-4 mb-3">
-            <label asp-for="PhoneNumber" class="form-label"></label>
-            <input asp-for="PhoneNumber" class="form-control" />
-            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-        </div>
+    .section-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #999;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 25px;
+    }
+
+    .custom-input {
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 0.95rem;
+        background-color: #fafafa;
+        transition: all 0.2s;
+        margin-bottom: 5px;
+    }
+
+        .custom-input:focus {
+            background-color: #fff;
+            border-color: #ff6b00;
+            box-shadow: none;
+            outline: none;
+        }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #555;
+        margin-bottom: 8px;
+    }
+
+    .btn-save {
+        background-color: #111;
+        color: white;
+        border: none;
+        padding: 14px 40px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+        .btn-save:hover {
+            background-color: #ff6b00;
+            color: white;
+        }
+
+    /* Başarı Mesajı Stili */
+    .alert-lion {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding: 15px;
+    }
+</style>
+
+<div class="container profile-container">
+    <div class="mb-5 text-center text-md-start">
+        <h2 class="fw-bold mb-1">Hesap Ayarları</h2>
+        <p class="text-muted small">Kişisel bilgilerinizi güncelleyerek üyeliğinizi yönetin.</p>
     </div>
 
-    <button class="btn btn-primary" type="submit">Kaydet</button>
-    <a asp-controller="User" asp-action="Index" class="btn btn-outline-secondary">Geri</a>
+    @if (TempData["success"] != null)
+    {
+        <div class="alert alert-lion shadow-sm mb-4">
+            <i class="fas fa-check-circle me-2"></i> @TempData["success"]
+        </div>
+    }
 
-    @Html.AntiForgeryToken()
-</form>
+    <form asp-action="Profile" method="post" class="mt-4">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
-@section Scripts{
+        <span class="section-title border-bottom pb-2">Kişisel Bilgiler</span>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label asp-for="FirstName" class="form-label">Ad</label>
+                <input asp-for="FirstName" class="form-control custom-input" placeholder="Adınız" />
+                <span asp-validation-for="FirstName" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="LastName" class="form-label">Soyad</label>
+                <input asp-for="LastName" class="form-control custom-input" placeholder="Soyadınız" />
+                <span asp-validation-for="LastName" class="text-danger small"></span>
+            </div>
+
+            <div class="col-12 mt-4">
+                <label asp-for="PhoneNumber" class="form-label">Telefon Numarası</label>
+                <input asp-for="PhoneNumber" class="form-control custom-input" placeholder="05xx xxx xx xx" />
+                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="mt-5 d-flex align-items-center justify-content-between">
+            <a asp-controller="User" asp-action="Index" class="text-muted text-decoration-none small">
+                <i class="fas fa-chevron-left me-1"></i> Panele Dön
+            </a>
+            <button class="btn btn-save shadow-sm" type="submit">Bilgileri Güncelle</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
-

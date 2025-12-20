@@ -1,40 +1,184 @@
 ﻿@model IEnumerable<odev1.Models.Service>
 
 @{
-    ViewData["Title"] = "Hizmet Yönetimi";
+    ViewData["Title"] = "Hizmet Yönetimi - LionGym";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Hizmet Listesi</h2>
-        <a asp-action="Create" class="btn btn-success"><i class="fas fa-plus"></i> Yeni Hizmet Ekle</a>
+<style>
+    body {
+        background-color: #ffffff;
+        color: #333;
+    }
+
+    /* Tablo Stilini Sıfırlama ve Özelleştirme */
+    .service-table {
+        border-collapse: separate;
+        border-spacing: 0 12px;
+    }
+
+        .service-table thead th {
+            border: none;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #999;
+            font-weight: 700;
+            padding: 0 20px 10px;
+        }
+
+        .service-table tbody tr {
+            background-color: #fafafa;
+            transition: all 0.2s ease;
+        }
+
+            .service-table tbody tr:hover {
+                background-color: #fff;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            }
+
+        .service-table td {
+            border: none;
+            padding: 20px;
+            vertical-align: middle;
+        }
+
+            .service-table td:first-child {
+                border-radius: 12px 0 0 12px;
+            }
+
+            .service-table td:last-child {
+                border-radius: 0 12px 12px 0;
+            }
+
+    .service-name {
+        font-weight: 700;
+        color: #111;
+        font-size: 1.05rem;
+    }
+
+    .price-text {
+        color: #ff6b00;
+        font-weight: 700;
+    }
+
+    /* Butonlar */
+    .btn-action {
+        width: 35px;
+        height: 35px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: all 0.2s;
+        text-decoration: none;
+        border: none;
+        font-size: 0.85rem;
+    }
+
+    .btn-edit {
+        background-color: #111;
+        color: #fff;
+    }
+
+        .btn-edit:hover {
+            background-color: #ff6b00;
+            color: #fff;
+        }
+
+    .btn-delete {
+        background-color: #f8f9fa;
+        color: #dc3545;
+        margin-left: 5px;
+    }
+
+        .btn-delete:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+    .btn-add-new {
+        background-color: #111;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+        .btn-add-new:hover {
+            background-color: #ff6b00;
+            color: white;
+        }
+</style>
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h2 class="fw-bold mb-1">Hizmet Branşları</h2>
+            <p class="text-muted small mb-0">Sunulan spor paketlerini ve fiyatlandırmayı yönetin.</p>
+        </div>
+        <a asp-action="Create" class="btn-add-new">
+            <i class="fas fa-plus me-2"></i>Yeni Hizmet
+        </a>
     </div>
 
-    <table class="table table-bordered table-hover shadow-sm">
-        <thead class="table-dark">
-            <tr>
-                <th>Hizmet Adı</th>
-                <th>Süre</th>
-                <th>Ücret</th>
-                <th>İşlemler</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
+    <div class="table-responsive">
+        <table class="table service-table">
+            <thead>
                 <tr>
-                    <td class="fw-bold">@item.name</td>
-
-                    <td><i class="far fa-clock me-1"></i> @item.duration dk</td>
-
-                    <td>@item.price.ToString("C2")</td>
-
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.id" class="btn btn-sm btn-warning">Düzenle</a>
-                        <a asp-action="Delete" asp-route-id="@item.id" class="btn btn-sm btn-danger" onclick="return confirm('Silmek istiyor musun?');">Sil</a>
-                    </td>
+                    <th>Hizmet Bilgisi</th>
+                    <th>Süre</th>
+                    <th>Ücretlendirme</th>
+                    <th class="text-end">İşlemler</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="width: 40px; height: 40px; background: #f0f0f0; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #111;">
+                                    <i class="fas fa-dumbbell"></i>
+                                </div>
+                                <span class="service-name">@item.name</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-muted small">
+                                <i class="far fa-clock me-1"></i> @item.duration dk
+                            </span>
+                        </td>
+                        <td>
+                            <span class="price-text">@item.price.ToString("C")</span>
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@item.id" class="btn-action btn-edit" title="Düzenle">
+                                <i class="fas fa-pen"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.id" class="btn-action btn-delete"
+                               onclick="return confirm('Bu hizmeti silmek istediğinize emin misiniz?');" title="Sil">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 border rounded-3 mt-4">
+            <p class="text-muted mb-0">Henüz tanımlanmış bir hizmet bulunmuyor.</p>
+        </div>
+    }
+
+    <div class="mt-5 border-top pt-4">
+        <a asp-controller="Admin" asp-action="Index" class="text-muted text-decoration-none small">
+            <i class="fas fa-chevron-left me-1"></i> Yönetim Paneline Dön
+        </a>
+    </div>
 </div>

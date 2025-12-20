@@ -1,38 +1,139 @@
 @model odev1.ViewModels.ProgressEntryViewModel
 @{
-    ViewData["Title"] = "İlerleme Kaydı Ekle";
+    ViewData["Title"] = "Gelişim Kaydı - LionGym";
 }
 
-<h2>İlerleme Kaydı Ekle</h2>
-<hr />
-<form asp-action="CreateProgress" method="post" class="card card-body">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="row">
-        <div class="col-md-4 mb-3">
-            <label asp-for="Date" class="form-label"></label>
-            <input asp-for="Date" type="date" class="form-control" />
-            <span asp-validation-for="Date" class="text-danger"></span>
-        </div>
-        <div class="col-md-4 mb-3">
-            <label asp-for="WeightKg" class="form-label"></label>
-            <input asp-for="WeightKg" class="form-control" />
-            <span asp-validation-for="WeightKg" class="text-danger"></span>
-        </div>
-        <div class="col-md-4 mb-3">
-            <label asp-for="BodyFatPercent" class="form-label"></label>
-            <input asp-for="BodyFatPercent" class="form-control" />
-            <span asp-validation-for="BodyFatPercent" class="text-danger"></span>
-        </div>
+<style>
+    body {
+        background-color: #ffffff;
+        color: #333;
+    }
+
+    .form-container {
+        max-width: 650px;
+        margin-top: 50px;
+    }
+
+    .section-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #999;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 30px;
+    }
+
+    /* Input Alanları */
+    .custom-input {
+        border: 1px solid #eee;
+        border-radius: 10px;
+        padding: 14px;
+        font-size: 1rem;
+        background-color: #fafafa;
+        transition: all 0.2s;
+    }
+
+        .custom-input:focus {
+            background-color: #fff;
+            border-color: #ff6b00;
+            box-shadow: none;
+            outline: none;
+        }
+
+    .input-group-text {
+        background-color: #fff;
+        border: 1px solid #eee;
+        border-left: none;
+        border-radius: 0 10px 10px 0;
+        color: #888;
+        font-weight: 600;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #555;
+        margin-bottom: 8px;
+    }
+
+    /* Butonlar */
+    .btn-save {
+        background-color: #111;
+        color: white;
+        border: none;
+        padding: 15px 45px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+        .btn-save:hover {
+            background-color: #ff6b00;
+            color: white;
+        }
+
+    .btn-cancel {
+        color: #888;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+        .btn-cancel:hover {
+            color: #333;
+        }
+</style>
+
+<div class="container form-container">
+    <div class="text-center text-md-start mb-5">
+        <h2 class="fw-bold mb-1">Gelişimini Kaydet</h2>
+        <p class="text-muted small">Bugünkü ölçümlerini girerek değişimini takip et.</p>
     </div>
 
-    <div class="d-flex gap-2">
-        <button class="btn btn-primary" type="submit">Kaydet</button>
-        <a asp-action="Progress" class="btn btn-outline-secondary">İptal</a>
-    </div>
-    @Html.AntiForgeryToken()
-</form>
+    <form asp-action="CreateProgress" method="post" class="mt-4">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
-@section Scripts{
+        <span class="section-title border-bottom pb-2">Ölçüm Detayları</span>
+
+        <div class="row g-4">
+            <div class="col-12 col-md-4">
+                <label asp-for="Date" class="form-label">Ölçüm Tarihi</label>
+                <input asp-for="Date" type="date" class="form-control custom-input" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="Date" class="text-danger small"></span>
+            </div>
+
+            <div class="col-6 col-md-4">
+                <label asp-for="WeightKg" class="form-label">Güncel Kilo</label>
+                <div class="input-group">
+                    <input asp-for="WeightKg" class="form-control custom-input" placeholder="00.0" />
+                    <span class="input-group-text">kg</span>
+                </div>
+                <span asp-validation-for="WeightKg" class="text-danger small"></span>
+            </div>
+
+            <div class="col-6 col-md-4">
+                <label asp-for="BodyFatPercent" class="form-label">Yağ Oranı</label>
+                <div class="input-group">
+                    <input asp-for="BodyFatPercent" class="form-control custom-input" placeholder="00.0" />
+                    <span class="input-group-text">%</span>
+                </div>
+                <span asp-validation-for="BodyFatPercent" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="mt-5 d-flex align-items-center justify-content-between border-top pt-4">
+            <a asp-action="Progress" class="btn-cancel">
+                <i class="fas fa-times me-1"></i> Vazgeç
+            </a>
+            <button class="btn btn-save shadow-sm" type="submit">
+                KAYDI TAMAMLA
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
-

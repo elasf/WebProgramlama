@@ -1,58 +1,161 @@
 @model IEnumerable<odev1.Models.ProgressEntry>
 @{
-    ViewData["Title"] = "İlerlemem";
+    ViewData["Title"] = "İlerlemem - LionGym";
     var points = Model.OrderBy(x => x.date).ToList();
 }
 
-<h2>İlerlemem</h2>
-@if (TempData["success"] != null)
-{
-    <div class="alert alert-success">@TempData["success"]</div>
-}
+<style>
+    body {
+        background-color: #ffffff;
+        color: #333;
+    }
 
-<div class="mb-3">
-    <a asp-action="CreateProgress" class="btn btn-primary">Yeni Kayıt</a>
-    <a asp-action="Index" class="btn btn-outline-secondary">Panele Dön</a>
-</div>
+    .progress-container {
+        max-width: 900px;
+        margin-top: 40px;
+    }
 
-<div class="card mb-3">
-    <div class="card-body">
-        <canvas id="weightChart" height="110"></canvas>
+    /* Grafik Kartı */
+    .chart-box {
+        border: 1px solid #eee;
+        border-radius: 16px;
+        padding: 20px;
+        background-color: #fafafa;
+        margin-bottom: 40px;
+    }
+
+    /* Tablo Yerine Sade Liste */
+    .data-row {
+        border-bottom: 1px solid #f0f0f0;
+        padding: 15px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background 0.2s;
+    }
+
+        .data-row:hover {
+            background-color: #fcfcfc;
+        }
+
+    .data-date {
+        font-weight: 700;
+        color: #111;
+        width: 30%;
+    }
+
+    .data-weight {
+        color: #ff6b00;
+        font-weight: 700;
+        width: 35%;
+        text-align: center;
+    }
+
+    .data-fat {
+        color: #888;
+        width: 35%;
+        text-align: right;
+    }
+
+    .section-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #999;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 20px;
+    }
+
+    .btn-dark-lion {
+        background-color: #111;
+        color: #fff;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+        .btn-dark-lion:hover {
+            background-color: #ff6b00;
+            color: #fff;
+        }
+
+    .alert-lion {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        border: none;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+</style>
+
+<div class="container progress-container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Gelişim Grafiğim</h2>
+            <p class="text-muted small">Kilo ve yağ oranı değişimini buradan takip edebilirsin.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="CreateProgress" class="btn btn-dark-lion shadow-sm">
+                <i class="fas fa-plus me-1"></i> Yeni Kayıt
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["success"] != null)
+    {
+        <div class="alert alert-lion shadow-sm">
+            <i class="fas fa-check-circle me-2"></i> @TempData["success"]
+        </div>
+    }
+
+    <div class="chart-box shadow-sm">
+        <canvas id="weightChart" height="100"></canvas>
+    </div>
+
+    <div class="mb-5">
+        <span class="section-title border-bottom pb-2">Ölçüm Geçmişi</span>
+
+        <div class="d-flex justify-content-between text-muted small px-1 mb-2">
+            <span style="width: 30%;">TARİH</span>
+            <span style="width: 35%; text-align: center;">AĞIRLIK (KG)</span>
+            <span style="width: 35%; text-align: right;">YAĞ ORANI (%)</span>
+        </div>
+
+        @if (!points.Any())
+        {
+            <div class="text-center py-5 text-muted border rounded-3">
+                Henüz bir gelişim kaydı girmediniz.
+            </div>
+        }
+        else
+        {
+            <div class="data-list">
+                @foreach (var r in points.AsEnumerable().Reverse())
+                {
+                    <div class="data-row px-1">
+                        <div class="data-date">@r.date.ToString("dd.MM.yyyy")</div>
+                        <div class="data-weight">@r.weightKg kg</div>
+                        <div class="data-fat">@(r.bodyFatPercent?.ToString() ?? "-") %</div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="text-center mt-5">
+        <a asp-action="Index" class="text-muted text-decoration-none small">
+            <i class="fas fa-chevron-left me-1"></i> Panele Dön
+        </a>
     </div>
 </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Tarih</th>
-            <th>Kilo (kg)</th>
-            <th>Yağ (%)</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var r in points)
-    {
-        <tr>
-            <td>@r.date.ToString("dd.MM.yyyy")</td>
-            <td>@r.weightKg</td>
-            <td>@(r.bodyFatPercent?.ToString() ?? "-")</td>
-        </tr>
-    }
-    </tbody>
-    @if (!points.Any())
-    {
-        <tfoot>
-            <tr>
-                <td colspan="3" class="text-muted">Henüz kayıt yok.</td>
-            </tr>
-        </tfoot>
-    }
-</table>
-
-@section Scripts{
+@section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(points.Select(p => p.date.ToString("dd.MM.yyyy"))));
+        const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(points.Select(p => p.date.ToString("dd.MM"))));
         const weights = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(points.Select(p => p.weightKg)));
 
         const ctx = document.getElementById('weightChart').getContext('2d');
@@ -61,25 +164,36 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Kilo (kg)',
+                    label: 'Kilo Değişimi',
                     data: weights,
-                    borderColor: '#0d6efd',
-                    backgroundColor: 'rgba(13,110,253,.1)',
-                    tension: .25,
+                    borderColor: '#ff6b00', // LionGym Turuncusu
+                    backgroundColor: 'rgba(255, 107, 0, 0.05)',
+                    tension: 0.4, // Daha yumuşak hatlar
                     fill: true,
-                    pointRadius: 3
+                    pointBackgroundColor: '#111',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
                 }]
             },
             options: {
                 responsive: true,
                 plugins: {
-                    legend: { display: true }
+                    legend: { display: false } // Daha sade görünüm için kapattık
                 },
                 scales: {
-                    y: { beginAtZero: false }
+                    y: {
+                        beginAtZero: false,
+                        grid: { color: '#f0f0f0' },
+                        ticks: { color: '#999' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#999' }
+                    }
                 }
             }
         });
     </script>
 }
-

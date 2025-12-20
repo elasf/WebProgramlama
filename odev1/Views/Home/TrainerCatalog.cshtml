@@ -1,89 +1,161 @@
 ﻿@model List<odev1.Models.Trainer>
 
 @{
-    ViewData["Title"] = "Eğitmen Kadromuz";
+    ViewData["Title"] = "Eğitmen Kadromuz - LionGym";
 }
 
-<div class="container py-5">
+<style>
+    body {
+        background-color: #ffffff;
+    }
 
-    <div class="text-center mb-5">
-        <h2 class="fw-bold display-6">Uzman Eğitmenlerimiz</h2>
-        <p class="text-muted">Hedeflerinize ulaşmanız için yanınızdayız.</p>
+    .trainer-card {
+        border: 1px solid #f0f0f0;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: #fff;
+    }
+
+        .trainer-card:hover {
+            transform: translateY(-10px);
+            border-color: #ff6b00;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        }
+
+    /* Üst Alan - Görsel Temsili */
+    .trainer-image-area {
+        height: 200px;
+        background: #fafafa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .trainer-icon-bg {
+        font-size: 5rem;
+        color: #eee;
+    }
+
+    /* Rozet Stilleri */
+    .lion-badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        display: inline-block;
+        margin: 2px;
+    }
+
+    .badge-expertise {
+        background-color: #f5f5f5;
+        color: #666;
+    }
+
+    .badge-service {
+        background-color: #fff3e6;
+        color: #ff6b00;
+    }
+
+    .section-label {
+        display: block;
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: #bbb;
+        letter-spacing: 1.2px;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+    }
+
+    /* Randevu Butonu */
+    .btn-randevu {
+        background-color: #111;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 12px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: block;
+        text-align: center;
+    }
+
+        .btn-randevu:hover {
+            background-color: #ff6b00;
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.3);
+        }
+</style>
+
+<div class="container py-5">
+    <div class="text-center mb-5 pb-4">
+        <h6 class="text-orange fw-bold text-uppercase" style="letter-spacing: 3px; color: #ff6b00;">Ekibimiz</h6>
+        <h2 class="fw-bold display-5 text-dark">Uzman Eğitmenler</h2>
+        <p class="text-muted mx-auto" style="max-width: 500px;">Hedeflerine giden yolda sana rehberlik edecek Türkiye'nin en iyi fitness kadrosuyla tanış.</p>
     </div>
 
     <div class="row g-4">
-
         @foreach (var trainer in Model)
         {
             <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm hover-effect">
+                <div class="trainer-card h-100 shadow-sm">
 
-                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center py-4">
-                        <i class="fas fa-user-circle text-secondary" style="font-size: 80px;"></i>
+                    <div class="trainer-image-area">
+                        <i class="fas fa-user-circle trainer-icon-bg"></i>
                     </div>
 
-                    <div class="card-body text-center">
-                        <h5 class="card-title fw-bold text-dark">@trainer.fullName</h5>
-                        <p class="text-muted small mb-3">Profesyonel Antrenör</p>
+                    <div class="card-body p-4">
+                        <div class="mb-4 text-center">
+                            <h4 class="fw-bold mb-1 text-dark">@trainer.fullName</h4>
+                            <p class="text-muted small">LionGym Pro Trainer</p>
+                        </div>
 
-                        <div class="mb-2">
-                            <small class="d-block text-muted fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">UZMANLIKLAR</small>
+                        <div class="mb-4">
+                            <span class="section-label">Uzmanlık Alanları</span>
                             @if (trainer.trainerExpertises != null && trainer.trainerExpertises.Any())
                             {
                                 foreach (var item in trainer.trainerExpertises)
                                 {
-                                    <span class="badge bg-primary bg-opacity-10 text-primary mb-1">
-                                        @item.expertise.expertise
-                                    </span>
+                                    <span class="lion-badge badge-expertise">@item.expertise.expertise</span>
                                 }
                             }
                             else
                             {
-                                <span class="badge bg-light text-muted">-</span>
+                                <span class="text-muted small italic">Genel Fitness</span>
                             }
                         </div>
 
                         <div class="mb-4">
-                            <small class="d-block text-muted fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">HİZMETLER</small>
+                            <span class="section-label">Verdiği Hizmetler</span>
                             @if (trainer.trainerServices != null && trainer.trainerServices.Any())
                             {
                                 foreach (var item in trainer.trainerServices)
                                 {
-                                    <span class="badge bg-success bg-opacity-10 text-success mb-1 border border-success border-opacity-25">
-                                        @item.service.name
-                                    </span>
+                                    <span class="lion-badge badge-service">@item.service.name</span>
                                 }
                             }
                             else
                             {
-                                <span class="badge bg-light text-muted">Hizmet Yok</span>
+                                <span class="text-muted small italic">Özel Program</span>
                             }
                         </div>
 
-                        <div class="d-grid mt-auto">
+                        <div class="pt-3 border-top">
                             <a asp-controller="Appointments"
                                asp-action="Create"
                                asp-route-trainerId="@trainer.id"
-                               class="btn btn-success rounded-pill btn-sm w-100 shadow-sm">
-                                <i class="fas fa-calendar-check me-1"></i> Randevu Al
+                               class="btn-randevu">
+                                <i class="far fa-calendar-alt me-2"></i> RANDEVU AL
                             </a>
                         </div>
                     </div>
-
                 </div>
             </div>
         }
-
     </div>
 </div>
-
-<style>
-    .hover-effect {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-        .hover-effect:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
-        }
-</style>

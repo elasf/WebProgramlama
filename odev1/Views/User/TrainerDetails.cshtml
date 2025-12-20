@@ -4,65 +4,164 @@
     int? selectedServiceId = (int?)ViewBag.SelectedServiceId;
     var dateStr = (string)ViewBag.Date;
     var slots = ViewBag.Slots as IEnumerable<(TimeSpan, TimeSpan)> ?? Enumerable.Empty<(TimeSpan, TimeSpan)>();
-    ViewData["Title"] = "Eğitmen Detayı";
+    ViewData["Title"] = $"{trainer.fullName} - Profil";
 }
 
-<h2>@trainer.fullName</h2>
-<h5>Verdiği Hizmetler</h5>
-<ul class="list-inline mb-3">
-@foreach(var s in services)
-{
-    <li class="list-inline-item">
-        <a class="btn btn-sm @(selectedServiceId == s.id ? "btn-primary" : "btn-outline-primary")"
-           asp-controller="User" asp-action="TrainerDetails"
-           asp-route-id="@trainer.id" asp-route-serviceId="@s.id" asp-route-date="@dateStr">
-            @s.name (@s.duration dk)
-        </a>
-    </li>
-}
-</ul>
+<style>
+    body {
+        background-color: #ffffff;
+        color: #333;
+    }
 
-<form method="get" class="row g-2 mb-3">
-    <input type="hidden" name="id" value="@trainer.id" />
-    <input type="hidden" name="serviceId" value="@selectedServiceId" />
-    <div class="col-auto">
-        <label class="col-form-label">Tarih:</label>
-    </div>
-    <div class="col-auto">
-        <input type="date" class="form-control" name="date" value="@dateStr" />
-    </div>
-    <div class="col-auto">
-        <button class="btn btn-outline-primary" type="submit">Slotları Göster</button>
-    </div>
-</form>
+    .trainer-header {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 30px;
+        margin-bottom: 40px;
+    }
 
-@if (selectedServiceId.HasValue && !string.IsNullOrEmpty(dateStr))
-{
-    <h5>Uygun Slotlar (@dateStr)</h5>
-    @if (slots.Any())
-    {
-        <ul class="list-group">
-        @foreach(var slot in slots)
-        {
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span>@slot.Item1.ToString(@"hh\:mm") - @slot.Item2.ToString(@"hh\:mm")</span>
-                <a class="btn btn-sm btn-success"
-                   asp-controller="Appointments" asp-action="Create"
-                   asp-route-serviceId="@selectedServiceId"
-                   asp-route-trainerId="@trainer.id"
-                   asp-route-date="@dateStr"
-                   asp-route-startTime="@slot.Item1.ToString()" >
-                    Randevu Al
-                </a>
-            </li>
+    /* Hizmet Butonları */
+    .service-link {
+        border: 1px solid #eee;
+        color: #666;
+        padding: 8px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+
+        .service-link:hover {
+            border-color: #ddd;
+            color: #111;
+            background: #fafafa;
         }
-        </ul>
+
+        .service-link.active {
+            border-color: #111;
+            background-color: #111;
+            color: #fff;
+        }
+
+    /* Slot Listesi */
+    .slot-item {
+        border: none;
+        border-bottom: 1px solid #f8f8f8;
+        padding: 15px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
-    else
+
+    .slot-time {
+        font-weight: 600;
+        color: #111;
+        font-size: 1.05rem;
+    }
+
+    /* Siyah Buton Stili */
+    .btn-action-dark {
+        background-color: #111;
+        color: #fff;
+        border: none;
+        padding: 6px 15px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: background 0.2s;
+        text-decoration: none;
+    }
+
+        .btn-action-dark:hover {
+            background-color: #ff6b00; /* LionGym turuncusu sadece burada sürpriz olarak çıksın */
+            color: #fff;
+        }
+
+    .custom-date {
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+
+    .section-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #999;
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+</style>
+
+<div class="container py-5" style="max-width: 800px;">
+    <div class="trainer-header d-flex justify-content-between align-items-end">
+        <div>
+            <span class="section-title">Uzman Eğitmen</span>
+            <h2 class="fw-bold mb-0">@trainer.fullName</h2>
+        </div>
+        <a asp-action="Trainers" class="text-muted small text-decoration-none">← Eğitmenlere Dön</a>
+    </div>
+
+    <div class="mb-5">
+        <span class="section-title d-block">Branşlar & Hizmetler</span>
+        <div class="d-flex flex-wrap gap-2">
+            @foreach (var s in services)
+            {
+                <a class="service-link @(selectedServiceId == s.id ? "active" : "")"
+                   asp-controller="User" asp-action="TrainerDetails"
+                   asp-route-id="@trainer.id" asp-route-serviceId="@s.id" asp-route-date="@dateStr">
+                    @s.name
+                </a>
+            }
+        </div>
+    </div>
+
+    <div class="mb-5 p-4 rounded-3" style="background-color: #fafafa;">
+        <span class="section-title d-block">Randevu Takvimi</span>
+        <form method="get" class="row g-2 align-items-center">
+            <input type="hidden" name="id" value="@trainer.id" />
+            <input type="hidden" name="serviceId" value="@selectedServiceId" />
+            <div class="col-auto">
+                <input type="date" class="form-control custom-date shadow-sm" name="date" value="@dateStr" />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-dark btn-sm px-4 rounded-2" type="submit">Sorgula</button>
+            </div>
+        </form>
+    </div>
+
+    @if (selectedServiceId.HasValue && !string.IsNullOrEmpty(dateStr))
     {
-        <div class="alert alert-warning">Bu tarih için uygun slot bulunamadı.</div>
+        <div class="mb-4">
+            <h6 class="fw-bold"><i class="far fa-calendar-check me-2"></i> @dateStr Tarihi İçin Müsait Saatler</h6>
+
+            @if (slots.Any())
+            {
+                <div class="mt-3">
+                    @foreach (var slot in slots)
+                    {
+                        <div class="slot-item">
+                            <span class="slot-time">@slot.Item1.ToString(@"hh\:mm") — @slot.Item2.ToString(@"hh\:mm")</span>
+                            <a class="btn-action-dark"
+                               asp-controller="Appointments" asp-action="Create"
+                               asp-route-serviceId="@selectedServiceId"
+                               asp-route-trainerId="@trainer.id"
+                               asp-route-date="@dateStr"
+                               asp-route-startTime="@slot.Item1.ToString()">
+                                Seç ve Devam Et
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-light border text-muted small mt-3">
+                    Seçilen tarihte uygun saat dilimi bulunamadı. Lütfen başka bir gün deneyin.
+                </div>
+            }
+        </div>
     }
-}
-
-<a class="btn btn-outline-secondary mt-3" asp-controller="User" asp-action="Trainers">Geri</a>
-
+</div>

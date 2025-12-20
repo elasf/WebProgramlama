@@ -1,124 +1,126 @@
 @model odev1.ViewModels.AppointmentRescheduleViewModel
 @{
-    ViewData["Title"] = "Randevu Güncelle - LionGym";
+    ViewData["Title"] = "Randevu Düzenle - LionGym";
 }
 
 <style>
     body {
-        background-color: #f8f9fa;
+        background-color: #ffffff;
+        color: #333;
     }
 
-    .reschedule-card {
-        border: none;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        background: white;
+    .form-container {
+        max-width: 500px;
+        margin-top: 50px;
     }
 
-    .info-badge {
-        background-color: #fff3e0;
-        color: #e65100;
-        padding: 10px 20px;
-        border-radius: 12px;
-        display: inline-block;
-        margin-bottom: 10px;
-        font-weight: 600;
+    .info-section {
+        border-bottom: 2px solid #f8f9fa;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
     }
 
-    .form-label {
-        font-weight: 600;
-        color: #444;
+    .info-label {
+        font-size: 0.8rem;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .info-value {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #222;
     }
 
     .custom-input {
-        border-radius: 12px;
-        border: 1px solid #ddd;
+        border: 1px solid #eee;
+        border-radius: 8px;
         padding: 12px;
-        transition: border-color 0.2s;
+        font-size: 1rem;
+        background-color: #fafafa;
+        transition: all 0.2s;
     }
 
         .custom-input:focus {
+            background-color: #fff;
             border-color: #ff6b00;
-            box-shadow: 0 0 0 0.2rem rgba(255, 107, 0, 0.1);
+            box-shadow: none;
+            outline: none;
         }
 
-    .btn-orange {
+    .btn-save {
         background-color: #ff6b00;
         color: white;
-        border-radius: 10px;
-        padding: 12px 35px;
-        font-weight: bold;
         border: none;
-        transition: all 0.3s;
+        padding: 14px;
+        border-radius: 8px;
+        font-weight: 600;
+        width: 100%;
+        margin-top: 20px;
+        transition: opacity 0.2s;
     }
 
-        .btn-orange:hover {
-            background-color: #e65100;
+        .btn-save:hover {
+            opacity: 0.9;
             color: white;
-            transform: scale(1.02);
         }
 
-    .divider {
-        border-top: 1px solid #eee;
-        margin: 25px 0;
+    .btn-cancel {
+        display: block;
+        text-align: center;
+        color: #888;
+        text-decoration: none;
+        font-size: 0.9rem;
+        margin-top: 15px;
     }
+
+        .btn-cancel:hover {
+            color: #333;
+        }
 </style>
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-7">
+<div class="container form-container">
+    <div class="mb-5">
+        <h2 class="fw-bold mb-1">Saati Güncelle</h2>
+        <p class="text-muted small">Yeni bir tarih ve saat seçerek planınızı güncelleyin.</p>
+    </div>
 
-            <div class="text-center mb-4">
-                <h2 class="fw-bold">Randevu Saatini Değiştir</h2>
-                <p class="text-muted">Planların mı değişti? Hemen yeni bir saat seç.</p>
-            </div>
-
-            <div class="card reschedule-card p-4 p-md-5">
-                <div class="mb-4 text-center">
-                    <div class="info-badge shadow-sm">
-                        <i class="fas fa-dumbbell me-2"></i> @Model.ServiceName
-                    </div>
-                    <div class="info-badge shadow-sm ms-md-2">
-                        <i class="fas fa-user-tie me-2"></i> @Model.TrainerName
-                    </div>
-                    <p class="small text-muted mt-2"><i class="fas fa-clock me-1"></i> Süre: @Model.ServiceDuration dk</p>
-                </div>
-
-                <div class="divider"></div>
-
-                <form asp-action="Reschedule" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" asp-for="AppointmentId" />
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 small"></div>
-
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <label asp-for="AppointmentDate" class="form-label mb-2">Yeni Tarih</label>
-                            <input asp-for="AppointmentDate" class="form-control custom-input shadow-sm" type="date"
-                                   min="@DateTime.Today.ToString("yyyy-MM-dd")" />
-                            <span asp-validation-for="AppointmentDate" class="text-danger small"></span>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label asp-for="StartTime" class="form-label mb-2">Yeni Saat</label>
-                            <input asp-for="StartTime" class="form-control custom-input shadow-sm" type="time" />
-                            <span asp-validation-for="StartTime" class="text-danger small"></span>
-                        </div>
-                    </div>
-
-                    <div class="text-center mt-5">
-                        <button class="btn btn-orange shadow-sm w-100 mb-3" type="submit">
-                            GÜNCELLEMEYİ KAYDET
-                        </button>
-                        <a asp-action="My" class="btn btn-link text-muted text-decoration-none">
-                            <i class="fas fa-times me-1"></i> Vazgeç ve Geri Dön
-                        </a>
-                    </div>
-                </form>
-            </div>
-
+    <div class="info-section row">
+        <div class="col-6">
+            <span class="info-label">Eğitmen</span>
+            <span class="info-value">@Model.TrainerName</span>
+        </div>
+        <div class="col-6">
+            <span class="info-label">Hizmet</span>
+            <span class="info-value">@Model.ServiceName</span>
         </div>
     </div>
+
+    <form asp-action="Reschedule" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="AppointmentId" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+        <div class="mb-4">
+            <label class="info-label">Yeni Tarih</label>
+            <input asp-for="AppointmentDate" class="form-control custom-input" type="date"
+                   min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            <span asp-validation-for="AppointmentDate" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-4">
+            <label class="info-label">Yeni Saat</label>
+            <input asp-for="StartTime" class="form-control custom-input" type="time" />
+            <span asp-validation-for="StartTime" class="text-danger small"></span>
+        </div>
+
+        <button type="submit" class="btn btn-save">Değişiklikleri Kaydet</button>
+        <a asp-action="My" class="btn btn-cancel">Vazgeç</a>
+    </form>
 </div>
 
 @section Scripts {

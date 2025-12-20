@@ -1,52 +1,136 @@
 @model IEnumerable<odev1.Models.Appointment>
 @{
-    ViewData["Title"] = "Randevularım";
+    ViewData["Title"] = "Randevularım - LionGym";
 }
 
-<h2>Randevularım</h2>
-<hr />
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Hizmet</th>
-            <th>Eğitmen</th>
-            <th>Tarih</th>
-            <th>Saat</th>
-            <th>Durum</th>
-            <th>Ücret</th>
-            <th>İşlemler</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach(var a in Model)
-    {
-        <tr>
-            <td>@a.service?.name</td>
-            <td>@a.trainer?.fullName</td>
-            <td>@a.AppointmentDate.ToString("dd.MM.yyyy")</td>
-            <td>@a.StartTime.ToString(@"hh\:mm") - @a.EndTime.ToString(@"hh\:mm")</td>
-            <td>@a.Status</td>
-            <td>@a.Price.ToString("C")</td>
-            <td class="d-flex gap-2">
-                <a asp-action="Reschedule" asp-route-id="@a.id"
-                   class="btn btn-sm btn-outline-primary @(a.Status == odev1.Models.AppointmentStatus.Cancelled ? "disabled" : "")">Yeniden Planla</a>
-                <form asp-action="Cancel" method="post" onsubmit="return confirm('Randevuyu iptal etmek istiyor musunuz?');">
-                    <input type="hidden" name="id" value="@a.id" />
-                    <button type="submit" class="btn btn-sm btn-outline-danger"
-                            disabled="@(a.Status == odev1.Models.AppointmentStatus.Cancelled ? "disabled" : null)">
-                        İptal
-                    </button>
-                </form>
-            </td>
-        </tr>
+<style>
+    body {
+        background-color: #ffffff;
+        color: #444;
     }
-    </tbody>
-    <tfoot>
-        <tr>
-            <td colspan="6">
-                <a asp-action="Create" class="btn btn-primary">Yeni Randevu</a>
-            </td>
-        </tr>
-    </tfoot>
-}
 
+    /* Sade Liste Elemanı */
+    .appointment-item {
+        border-bottom: 1px solid #eee;
+        padding: 20px 0;
+        transition: background 0.2s;
+    }
+
+        .appointment-item:hover {
+            background-color: #fafafa;
+        }
+
+    /* Durum Noktaları (Badge yerine küçük bir nokta) */
+    .status-dot {
+        height: 10px;
+        width: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+    }
+
+    .dot-pending {
+        background-color: #ff6b00;
+    }
+
+    .dot-confirmed {
+        background-color: #28a745;
+    }
+
+    .dot-cancelled {
+        background-color: #dc3545;
+    }
+
+    .date-text {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: #ff6b00;
+        display: block;
+        line-height: 1;
+    }
+
+    .month-text {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: #888;
+        letter-spacing: 1px;
+    }
+
+    .btn-action {
+        font-size: 0.85rem;
+        font-weight: 500;
+        padding: 5px 15px;
+        border-radius: 6px;
+        text-decoration: none !important;
+    }
+</style>
+
+<div class="container py-5" style="max-width: 900px;">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Randevularım</h2>
+            <p class="text-muted small mb-0">Antrenman takviminizi buradan yönetebilirsiniz.</p>
+        </div>
+        <a asp-action="Create" class="btn btn-dark btn-sm px-4 rounded-3">
+            + Yeni Randevu
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 border rounded-3">
+            <p class="text-muted">Henüz planlanmış bir randevunuz bulunmuyor.</p>
+        </div>
+    }
+    else
+    {
+        <div class="appointment-list">
+            @foreach (var a in Model)
+            {
+                <div class="row appointment-item align-items-center">
+                    <div class="col-2 col-md-1 text-center">
+                        <span class="month-text">@a.AppointmentDate.ToString("MMM")</span>
+                        <span class="date-text">@a.AppointmentDate.ToString("dd")</span>
+                    </div>
+
+                    <div class="col-6 col-md-6">
+                        <h6 class="fw-bold mb-0">@a.service?.name</h6>
+                        <small class="text-muted">
+                            @a.trainer?.fullName &bull; @a.StartTime.ToString(@"hh\:mm") - @a.EndTime.ToString(@"hh\:mm")
+                        </small>
+                    </div>
+
+                    <div class="col-4 col-md-2 text-end text-md-center">
+                        @{
+                            var dotClass = a.Status switch
+                            {
+                                odev1.Models.AppointmentStatus.Cancelled => "dot-cancelled",
+                                odev1.Models.AppointmentStatus.Pending => "dot-pending",
+                                _ => "dot-confirmed"
+                            };
+                        }
+                        <span class="status-dot @dotClass"></span>
+                        <span class="small text-muted">@a.Status</span>
+                    </div>
+
+                    <div class="col-12 col-md-3 text-end mt-3 mt-md-0">
+                        <div class="d-flex justify-content-end gap-3 align-items-center">
+                            @if (a.Status != odev1.Models.AppointmentStatus.Cancelled)
+                            {
+                                <a asp-action="Reschedule" asp-route-id="@a.id" class="text-dark small fw-bold">Düzenle</a>
+                                <form asp-action="Cancel" method="post" onsubmit="return confirm('İptal edilsin mi?');">
+                                    <input type="hidden" name="id" value="@a.id" />
+                                    <button type="submit" class="btn btn-link text-danger p-0 small text-decoration-none">İptal Et</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="text-muted small italic">İptal Edildi</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

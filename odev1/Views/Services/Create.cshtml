@@ -1,38 +1,152 @@
 ﻿@model odev1.Models.Service
 
-<div class="container mt-4">
-    <h3>Yeni Hizmet Ekle</h3>
-    <hr />
-    <div class="row">
-        <div class="col-md-6">
-            <form asp-action="Create">
-                <div class="mb-3">
-                    <label class="form-label">Hizmet Adı</label>
-                    <input asp-for="name" class="form-control" placeholder="Örn: Reformer Pilates" />
-                    <span asp-validation-for="name" class="text-danger"></span>
-                </div>
+@{
+    ViewData["Title"] = "Yeni Hizmet - LionGym";
+}
 
-                <div class="mb-3">
-                    <label class="form-label">Süre (Dakika)</label>
-                    <div class="input-group">
-                        <input asp-for="duration" class="form-control" type="number" value="60" />
-                        <span class="input-group-text">dk</span>
+<style>
+    body {
+        background-color: #ffffff;
+        color: #333;
+    }
+
+    .form-container {
+        max-width: 600px;
+        margin-top: 50px;
+    }
+
+    .form-card {
+        border: 1px solid #f0f0f0;
+        border-radius: 16px;
+        padding: 40px;
+        background-color: #fff;
+    }
+
+    .section-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #999;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 25px;
+    }
+
+    /* Giriş Elemanları */
+    .custom-input {
+        border: 1px solid #eee;
+        border-radius: 10px;
+        padding: 12px;
+        background-color: #fafafa;
+        transition: all 0.2s;
+        font-size: 0.95rem;
+    }
+
+        .custom-input:focus {
+            background-color: #fff;
+            border-color: #ff6b00;
+            box-shadow: none;
+            outline: none;
+        }
+
+    .input-group-text {
+        background-color: #fff;
+        border: 1px solid #eee;
+        color: #888;
+        font-weight: 600;
+        border-radius: 10px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #444;
+        margin-bottom: 8px;
+    }
+
+    /* Butonlar */
+    .btn-lion-save {
+        background-color: #111;
+        color: white;
+        border: none;
+        padding: 14px 40px;
+        border-radius: 10px;
+        font-weight: 700;
+        transition: all 0.2s;
+    }
+
+        .btn-lion-save:hover {
+            background-color: #ff6b00;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .btn-lion-link {
+        color: #888;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+        .btn-lion-link:hover {
+            color: #111;
+        }
+</style>
+
+<div class="container form-container">
+    <div class="text-center text-md-start mb-5">
+        <h2 class="fw-bold mb-1">Yeni Hizmet Tanımla</h2>
+        <p class="text-muted small">Salon bünyesinde sunulacak yeni bir branş veya paket oluşturun.</p>
+    </div>
+
+    <div class="form-card shadow-sm">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+            <span class="section-title border-bottom pb-2">Branş Bilgileri</span>
+
+            <div class="mb-4">
+                <label class="form-label">Hizmet Adı</label>
+                <input asp-for="name" class="form-control custom-input" placeholder="Örn: Reformer Pilates" />
+                <span asp-validation-for="name" class="text-danger small"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label class="form-label">Seans Süresi</label>
+                    <div class="input-group shadow-sm" style="border-radius: 10px; overflow: hidden;">
+                        <input asp-for="duration" class="form-control custom-input border-end-0" type="number" value="60" />
+                        <span class="input-group-text border-start-0">dk</span>
                     </div>
-                    <span asp-validation-for="duration" class="text-danger"></span>
+                    <span asp-validation-for="duration" class="text-danger small"></span>
                 </div>
 
-                <div class="mb-3">
+                <div class="col-md-6 mb-4">
                     <label class="form-label">Seans Ücreti</label>
-                    <div class="input-group">
-                        <span class="input-group-text">₺</span>
-                        <input asp-for="price" class="form-control" type="number" step="0.01" />
+                    <div class="input-group shadow-sm" style="border-radius: 10px; overflow: hidden;">
+                        <span class="input-group-text border-end-0">₺</span>
+                        <input asp-for="price" class="form-control custom-input border-start-0" type="number" step="0.01" placeholder="0.00" />
                     </div>
-                    <span asp-validation-for="price" class="text-danger"></span>
+                    <span asp-validation-for="price" class="text-danger small"></span>
                 </div>
+            </div>
 
-                <button type="submit" class="btn btn-primary">Kaydet</button>
-                <a asp-action="listServices" class="btn btn-secondary">Geri Dön</a>
-            </form>
-        </div>
+            <div class="mt-4 d-flex align-items-center justify-content-between pt-4 border-top">
+                <a asp-action="Services" class="btn-lion-link">
+                    <i class="fas fa-chevron-left me-1"></i> Listeye Dön
+                </a>
+                <button type="submit" class="btn btn-lion-save shadow">
+                    HİZMETİ KAYDET
+                </button>
+            </div>
+        </form>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

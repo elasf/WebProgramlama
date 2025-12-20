@@ -1,133 +1,207 @@
 ﻿@model odev1.Models.ViewModels.TrainerManageViewModel
 
 @{
-    ViewData["Title"] = "Yeni Antrenör Ekle";
+    ViewData["Title"] = "Eğitmen Kaydı - LionGym";
 }
 
-<div class="container mt-4">
-    <h3>Yeni Antrenör Ekle</h3>
-    <hr />
+<style>
+    body {
+        background-color: #ffffff;
+        color: #333;
+    }
 
-    <div class="row">
-        <div class="col-md-7">
+    .create-container {
+        max-width: 950px;
+        margin-top: 40px;
+    }
 
-            <form asp-action="Create" method="post">
+    .form-card {
+        border: 1px solid #f0f0f0;
+        border-radius: 16px;
+        padding: 40px;
+        background-color: #fff;
+    }
 
-                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+    .section-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #999;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 25px;
+    }
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Ad</label>
-                        <input asp-for="FirstName" class="form-control" placeholder="Örn: Ahmet" />
-                        <span asp-validation-for="FirstName" class="text-danger"></span>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Soyad</label>
-                        <input asp-for="LastName" class="form-control" placeholder="Örn: Yılmaz" />
-                        <span asp-validation-for="LastName" class="text-danger"></span>
-                    </div>
+    .custom-input {
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 12px;
+        background-color: #fafafa;
+        transition: all 0.2s;
+    }
+
+        .custom-input:focus {
+            background-color: #fff;
+            border-color: #ff6b00;
+            box-shadow: none;
+            outline: none;
+        }
+
+    /* Seçim Grupları (Hizmet & Uzmanlık) */
+    .selection-panel {
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 20px;
+        background-color: #fafafa;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    /* Saat Belirleme Alanı */
+    .time-settings-box {
+        background-color: #fffaf5;
+        border: 1px solid #ffe0b2;
+        border-radius: 12px;
+        padding: 25px;
+    }
+
+    .time-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #e65100;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-check-input:checked {
+        background-color: #ff6b00;
+        border-color: #ff6b00;
+    }
+
+    .btn-lion-save {
+        background-color: #111;
+        color: white;
+        border: none;
+        padding: 15px 50px;
+        border-radius: 10px;
+        font-weight: 700;
+        transition: all 0.2s;
+    }
+
+        .btn-lion-save:hover {
+            background-color: #ff6b00;
+            color: white;
+        }
+</style>
+
+<div class="container create-container py-5">
+    <div class="mb-5 text-center text-md-start">
+        <h2 class="fw-bold mb-1">Yeni Eğitmen Kaydı</h2>
+        <p class="text-muted small">Eğitmen bilgilerini, uzmanlık alanlarını ve mesai saatlerini tanımlayın.</p>
+    </div>
+
+    <div class="form-card shadow-sm">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-4"></div>
+
+            <span class="section-title border-bottom pb-2">Kişisel ve İletişim</span>
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <label class="form-label fw-600 small">Ad</label>
+                    <input asp-for="FirstName" class="form-control custom-input" placeholder="Örn: Can" />
+                    <span asp-validation-for="FirstName" class="text-danger small"></span>
                 </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">E-Posta</label>
-                        <input asp-for="email" class="form-control" placeholder="ornek@mail.com" />
-                        <span asp-validation-for="email" class="text-danger"></span>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Telefon Numarası</label>
-                        <input asp-for="PhoneNumber" class="form-control" placeholder="05XX XXX XX XX" />
-                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                    </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-600 small">Soyad</label>
+                    <input asp-for="LastName" class="form-control custom-input" placeholder="Örn: Demir" />
+                    <span asp-validation-for="LastName" class="text-danger small"></span>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Şifre</label>
-                    <input asp-for="Password" type="password" class="form-control" />
-                    <span asp-validation-for="Password" class="text-danger"></span>
+                <div class="col-md-6">
+                    <label class="form-label fw-600 small">E-Posta</label>
+                    <input asp-for="email" class="form-control custom-input" placeholder="mail@liongym.com" />
+                    <span asp-validation-for="email" class="text-danger small"></span>
                 </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-600 small">Telefon</label>
+                    <input asp-for="PhoneNumber" class="form-control custom-input" placeholder="05XX..." />
+                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-600 small">Şifre</label>
+                    <input asp-for="Password" type="password" class="form-control custom-input" placeholder="••••••••" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+            </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Vereceği Hizmetler</label>
-                    <div class="border rounded p-3 bg-light" style="max-height: 200px; overflow-y: auto;">
-                        <div class="row">
-                            @if (ViewBag.Services != null)
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <span class="section-title border-bottom pb-2">Hizmet Branşları</span>
+                    <div class="selection-panel shadow-sm">
+                        @if (ViewBag.Services != null)
+                        {
+                            @foreach (var item in (Microsoft.AspNetCore.Mvc.Rendering.MultiSelectList)ViewBag.Services)
                             {
-                                foreach (var item in (Microsoft.AspNetCore.Mvc.Rendering.MultiSelectList)ViewBag.Services)
-                                {
-                                    <div class="col-sm-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox"
-                                                   name="SelectedServiceIds"
-                                                   value="@item.Value"
-                                                   id="srv_@item.Value"
-                                                   @(item.Selected ? "checked" : "")>
-                                            <label class="form-check-label user-select-none" for="srv_@item.Value">
-                                                @item.Text
-                                            </label>
-                                        </div>
-                                    </div>
-                                }
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="SelectedServiceIds" value="@item.Value" id="srv_@item.Value" @(item.Selected ? "checked" : "")>
+                                    <label class="form-check-label small" for="srv_@item.Value">@item.Text</label>
+                                </div>
                             }
-                            else
+                        }
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <span class="section-title border-bottom pb-2">Uzmanlık Alanları</span>
+                    <div class="selection-panel shadow-sm">
+                        @if (ViewBag.Expertises != null)
+                        {
+                            @foreach (var item in (Microsoft.AspNetCore.Mvc.Rendering.MultiSelectList)ViewBag.Expertises)
                             {
-                                <div class="text-danger">Hizmet listesi boş.</div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="SelectedExpertiseIds" value="@item.Value" id="exp_@item.Value" @(item.Selected ? "checked" : "")>
+                                    <label class="form-check-label small" for="exp_@item.Value">@item.Text</label>
+                                </div>
                             }
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <span class="section-title border-bottom pb-2">Çalışma Takvimi</span>
+            <div class="time-settings-box mb-5">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded bg-white">
+                            <span class="time-label"><i class="fas fa-calendar-day me-1"></i> Hafta İçi</span>
+                            <div class="d-flex gap-2">
+                                <input type="time" name="WeekdayStart" class="form-control custom-input" value="09:00" />
+                                <span class="align-self-center">-</span>
+                                <input type="time" name="WeekdayEnd" class="form-control custom-input" value="21:00" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded bg-white">
+                            <span class="time-label"><i class="fas fa-calendar-week me-1"></i> Hafta Sonu</span>
+                            <div class="d-flex gap-2">
+                                <input type="time" name="WeekendStart" class="form-control custom-input" value="10:00" />
+                                <span class="align-self-center">-</span>
+                                <input type="time" name="WeekendEnd" class="form-control custom-input" value="17:00" />
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="row mt-3 p-3 border rounded bg-light">
-                    <h5 class="col-12 border-bottom pb-2 mb-3">Çalışma Saatlerini Belirle</h5>
+            </div>
 
-                    <div class="col-md-3">
-                        <label>Hafta İçi Başlangıç</label>
-                        <input type="time" name="WeekdayStart" class="form-control" value="09:00" />
-                    </div>
-                    <div class="col-md-3">
-                        <label>Hafta İçi Bitiş</label>
-                        <input type="time" name="WeekdayEnd" class="form-control" value="21:00" />
-                    </div>
-
-                    <div class="col-md-3">
-                        <label>Hafta Sonu Başlangıç</label>
-                        <input type="time" name="WeekendStart" class="form-control" value="10:00" />
-                    </div>
-                    <div class="col-md-3">
-                        <label>Hafta Sonu Bitiş</label>
-                        <input type="time" name="WeekendEnd" class="form-control" value="17:00" />
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Uzmanlık Alanları</label>
-                    <div class="border rounded p-3 bg-light" style="max-height: 200px; overflow-y: auto;">
-                        <div class="row">
-                            @if (ViewBag.Expertises != null)
-                            {
-                                foreach (var item in (Microsoft.AspNetCore.Mvc.Rendering.MultiSelectList)ViewBag.Expertises)
-                                {
-                                    <div class="col-sm-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox"
-                                                   name="SelectedExpertiseIds"
-                                                   value="@item.Value"
-                                                   id="exp_@item.Value"
-                                                   @(item.Selected ? "checked" : "")>
-                                            <label class="form-check-label user-select-none" for="exp_@item.Value">
-                                                @item.Text
-                                            </label>
-                                        </div>
-                                    </div>
-                                }
-                            }
-                        </div>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Kaydet</button>
-                <a asp-action="Index" class="btn btn-secondary">Geri Dön</a>
-
-            </form>
-        </div>
+            <div class="d-flex align-items-center justify-content-between pt-4 border-top">
+                <a asp-action="Index" class="text-muted text-decoration-none small">
+                    <i class="fas fa-chevron-left me-1"></i> Geri Dön
+                </a>
+                <button type="submit" class="btn btn-lion-save shadow">
+                    KAYDI TAMAMLA
+                </button>
+            </div>
+        </form>
     </div>
 </div>

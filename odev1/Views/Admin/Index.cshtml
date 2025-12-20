@@ -1,1 +1,199 @@
-﻿<h3>ADMİN SAYFASI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1</h3>
+﻿@{
+    ViewData["Title"] = "Yönetim Paneli - LionGym";
+}
+
+<style>
+    body {
+        background-color: #ffffff;
+        color: #333;
+    }
+
+    /* İstatistik Kartları */
+    .dashboard-stat-card {
+        border: 1px solid #f0f0f0;
+        border-radius: 15px;
+        padding: 25px;
+        transition: all 0.3s ease;
+        background: #fff;
+        height: 100%;
+    }
+
+        .dashboard-stat-card:hover {
+            border-color: #ff6b00;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        }
+
+    .stat-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: #999;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .stat-value {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #111;
+        line-height: 1;
+    }
+
+    /* Hızlı Erişim Menüsü */
+    .quick-link-item {
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        text-decoration: none !important;
+        color: #444;
+        transition: all 0.2s;
+        margin-bottom: 15px;
+    }
+
+        .quick-link-item:hover {
+            background-color: #111;
+            color: #fff;
+            border-color: #111;
+        }
+
+    .icon-box {
+        width: 40px;
+        height: 40px;
+        background: #fafafa;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-size: 1.1rem;
+        color: #ff6b00;
+        transition: all 0.2s;
+    }
+
+    .quick-link-item:hover .icon-box {
+        background: rgba(255,255,255,0.1);
+        color: #fff;
+    }
+
+    .section-title {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #111;
+        font-weight: 800;
+        margin-bottom: 25px;
+        display: block;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="mb-5 d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold mb-1">Yönetim Merkezi ⚙️</h2>
+            <p class="text-muted small mb-0">LionGym salon verileri ve sistem yönetimi.</p>
+        </div>
+        <div class="text-end">
+            <span class="badge bg-dark rounded-pill px-3 py-2">Admin Modu</span>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="dashboard-stat-card">
+                <span class="stat-label">Toplam Üye</span>
+                <div class="stat-value">@ViewBag.MemberCount</div>
+                <div class="mt-2 small text-success">
+                    <i class="fas fa-arrow-up me-1"></i> Aktif Liste
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-stat-card">
+                <span class="stat-label">Eğitmen Kadrosu</span>
+                <div class="stat-value">@ViewBag.TrainerCount</div>
+                <div class="mt-2 small text-muted">Uzman Ekip</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-stat-card">
+                <span class="stat-label">Bugünkü Randevular</span>
+                <div class="stat-value">@ViewBag.TodayAppointments</div>
+                <div class="mt-2 small text-orange" style="color:#ff6b00">
+                    <i class="far fa-calendar-check me-1"></i> Bekleyen
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-stat-card">
+                <span class="stat-label">Aktif Hizmetler</span>
+                <div class="stat-value">@ViewBag.ServiceCount</div>
+                <div class="mt-2 small text-muted">Branş Sayısı</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row pt-4">
+        <div class="col-lg-6 pe-lg-5">
+            <span class="section-title">Yönetim İşlemleri</span>
+
+            <a asp-action="MemberList" class="quick-link-item">
+                <div class="icon-box"><i class="fas fa-users"></i></div>
+                <div class="flex-grow-1">
+                    <div class="fw-bold">Üye Listesi</div>
+                    <div class="small opacity-75">Tüm sporcuları görüntüle ve yönet</div>
+                </div>
+                <i class="fas fa-chevron-right opacity-25"></i>
+            </a>
+
+            <a asp-action="createTrainer" class="quick-link-item">
+                <div class="icon-box"><i class="fas fa-user-plus"></i></div>
+                <div class="flex-grow-1">
+                    <div class="fw-bold">Yeni Eğitmen Ekle</div>
+                    <div class="small opacity-75">Sisteme yeni uzman tanımla</div>
+                </div>
+                <i class="fas fa-chevron-right opacity-25"></i>
+            </a>
+
+            <a asp-controller="Services" asp-action="listServices" class="quick-link-item">
+                <div class="icon-box"><i class="fas fa-dumbbell"></i></div>
+                <div class="flex-grow-1">
+                    <div class="fw-bold">Hizmet Yönetimi</div>
+                    <div class="small opacity-75">Branşları ve fiyatları düzenle</div>
+                </div>
+                <i class="fas fa-chevron-right opacity-25"></i>
+            </a>
+        </div>
+
+        <div class="col-lg-6 ps-lg-5 mt-5 mt-lg-0">
+            <span class="section-title">Sistem Özeti</span>
+            <div class="p-4 rounded-4" style="background-color: #fafafa; border: 1px dashed #ddd;">
+                <div class="d-flex justify-content-between mb-3 small">
+                    <span class="text-muted">Sunucu Durumu</span>
+                    <span class="text-success fw-bold">Çalışıyor</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3 small">
+                    <span class="text-muted">Veritabanı</span>
+                    <span class="fw-bold">PostgreSQL</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3 small">
+                    <span class="text-muted">Bekleyen AI Analizleri</span>
+                    <span class="badge bg-warning text-dark">0</span>
+                </div>
+                <hr>
+                <div class="text-center">
+                    <p class="small text-muted mb-0">LionGym Admin Panel v1.0</p>
+                </div>
+            </div>
+
+            <div class="mt-4 text-center">
+                <a asp-controller="Home" asp-action="Index" class="text-dark small text-decoration-none fw-bold">
+                    <i class="fas fa-external-link-alt me-1"></i> Site Önizleme
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

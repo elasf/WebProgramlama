@@ -1,112 +1,190 @@
 @model odev1.ViewModels.AIRecommendationResultViewModel
 @{
-    ViewData["Title"] = "AI Önerileri";
+    ViewData["Title"] = "Analiz Sonuçları - LionGym";
 }
-
-<h2>AI Önerileriniz</h2>
-<hr />
-
-@if (TempData["success"] != null)
-{
-    <div class="alert alert-success">@TempData["success"]</div>
-}
-
-<div class="row">
-    @if (!string.IsNullOrEmpty(Model.PhotoPath))
-    {
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="card-header">Yüklenen Fotoğraf</div>
-                <div class="card-body">
-                    <img src="@Model.PhotoPath" alt="Kullanıcı fotoğrafı" class="img-fluid rounded" />
-                </div>
-            </div>
-        </div>
-    }
-
-    <div class="@(string.IsNullOrEmpty(Model.PhotoPath) ? "col-12" : "col-md-8")">
-        <div class="card mb-3">
-            <div class="card-header">
-                <h5 class="mb-0">Bilgileriniz</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    @if (Model.Height.HasValue)
-                    {
-                        <div class="col-md-3">
-                            <strong>Boy:</strong> @Model.Height cm
-                        </div>
-                    }
-                    @if (Model.Weight.HasValue)
-                    {
-                        <div class="col-md-3">
-                            <strong>Kilo:</strong> @Model.Weight kg
-                        </div>
-                    }
-                    @if (!string.IsNullOrEmpty(Model.BodyType))
-                    {
-                        <div class="col-md-3">
-                            <strong>Vücut Tipi:</strong> @Model.BodyType
-                        </div>
-                    }
-                    @if (!string.IsNullOrEmpty(Model.Goal))
-                    {
-                        <div class="col-md-3">
-                            <strong>Hedef:</strong> @Model.Goal
-                        </div>
-                    }
-                </div>
-                <small class="text-muted">Oluşturulma: @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</small>
-            </div>
-        </div>
-    </div>
-</div>
-
-@if (!string.IsNullOrEmpty(Model.ExerciseRecommendations))
-{
-    <div class="card mb-3">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">💪 Egzersiz Önerileri</h5>
-        </div>
-        <div class="card-body">
-            <div class="whitespace-pre-line">@Model.ExerciseRecommendations</div>
-        </div>
-    </div>
-}
-
-@if (!string.IsNullOrEmpty(Model.DietRecommendations))
-{
-    <div class="card mb-3">
-        <div class="card-header bg-success text-white">
-            <h5 class="mb-0">🥗 Beslenme Önerileri</h5>
-        </div>
-        <div class="card-body">
-            <div class="whitespace-pre-line">@Model.DietRecommendations</div>
-        </div>
-    </div>
-}
-
-@if (!string.IsNullOrEmpty(Model.GeneralAdvice))
-{
-    <div class="card mb-3">
-        <div class="card-header bg-info text-white">
-            <h5 class="mb-0">💡 Genel Tavsiyeler</h5>
-        </div>
-        <div class="card-body">
-            <div class="whitespace-pre-line">@Model.GeneralAdvice</div>
-        </div>
-    </div>
-}
-
-<div class="d-flex gap-2">
-    <a asp-action="Create" class="btn btn-primary">Yeni Öneri Al</a>
-    <a asp-action="MyRecommendations" class="btn btn-outline-secondary">Tüm Önerilerim</a>
-    <a asp-controller="User" asp-action="Index" class="btn btn-outline-secondary">Panele Dön</a>
-</div>
 
 <style>
-    .whitespace-pre-line {
+    body {
+        background-color: #ffffff;
+        color: #333;
+    }
+
+    .result-container {
+        max-width: 900px;
+        margin-top: 40px;
+    }
+
+    /* Bilgi Özeti Alanı */
+    .user-info-bar {
+        background-color: #fafafa;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #eee;
+        margin-bottom: 30px;
+    }
+
+    .info-item {
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+        .info-item strong {
+            color: #111;
+            display: block;
+            font-size: 1rem;
+        }
+
+    /* Öneri Blokları */
+    .advice-section {
+        margin-bottom: 40px;
+        border-left: 3px solid #eee;
+        padding-left: 25px;
+        transition: border-color 0.3s;
+    }
+
+        .advice-section:hover {
+            border-color: #ff6b00;
+        }
+
+    .advice-title {
+        font-weight: 800;
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        color: #111;
+    }
+
+    .advice-content {
+        line-height: 1.8;
+        color: #555;
         white-space: pre-line;
+        font-size: 1.05rem;
+    }
+
+    /* Fotoğraf Kartı */
+    .photo-card {
+        border: 1px solid #eee;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .photo-label {
+        background: #f8f8f8;
+        padding: 10px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+    }
+
+    .btn-lion-dark {
+        background-color: #111;
+        color: #fff;
+        border-radius: 8px;
+        padding: 12px 25px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+        .btn-lion-dark:hover {
+            background-color: #ff6b00;
+            color: #fff;
+        }
+
+    .btn-lion-outline {
+        border: 1px solid #ddd;
+        color: #666;
+        border-radius: 8px;
+        padding: 12px 25px;
+        font-weight: 600;
+        text-decoration: none;
     }
 </style>
 
+<div class="container result-container py-5">
+    <div class="mb-5">
+        <h2 class="fw-bold mb-1">Analiz Sonuçların Hazır 🎯</h2>
+        <p class="text-muted small">AI tarafından oluşturulan sana özel @Model.Goal planı.</p>
+    </div>
+
+    @if (TempData["success"] != null)
+    {
+        <div class="alert alert-success border-0 rounded-3 mb-4 small">
+            <i class="fas fa-check-circle me-2"></i> @TempData["success"]
+        </div>
+    }
+
+    <div class="row mb-5 g-4">
+        @if (!string.IsNullOrEmpty(Model.PhotoPath))
+        {
+            <div class="col-md-4">
+                <div class="photo-card shadow-sm">
+                    <div class="photo-label text-muted">ANALİZ EDİLEN FORM</div>
+                    <img src="@Model.PhotoPath" alt="Kullanıcı fotoğrafı" class="img-fluid" />
+                </div>
+            </div>
+        }
+
+        <div class="@(string.IsNullOrEmpty(Model.PhotoPath) ? "col-12" : "col-md-8")">
+            <div class="user-info-bar shadow-sm">
+                <div class="row text-center text-md-start">
+                    <div class="col-6 col-md-3 mb-3 mb-md-0 info-item">
+                        <span>BOY</span>
+                        <strong>@(Model.Height?.ToString() ?? "-") cm</strong>
+                    </div>
+                    <div class="col-6 col-md-3 mb-3 mb-md-0 info-item">
+                        <span>KİLO</span>
+                        <strong>@(Model.Weight?.ToString() ?? "-") kg</strong>
+                    </div>
+                    <div class="col-6 col-md-3 info-item">
+                        <span>TİP</span>
+                        <strong>@(Model.BodyType ?? "Belirtilmedi")</strong>
+                    </div>
+                    <div class="col-6 col-md-3 info-item">
+                        <span>HEDEF</span>
+                        <strong>@(Model.Goal ?? "Genel")</strong>
+                    </div>
+                </div>
+                <div class="mt-3 pt-3 border-top text-muted" style="font-size: 0.75rem;">
+                    Analiz Tarihi: @Model.CreatedAt.ToString("dd MMMM yyyy HH:mm")
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="advice-container mb-5">
+        @if (!string.IsNullOrEmpty(Model.ExerciseRecommendations))
+        {
+            <div class="advice-section">
+                <h5 class="advice-title"><span class="me-2">💪</span> Egzersiz Programı</h5>
+                <div class="advice-content">@Model.ExerciseRecommendations</div>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.DietRecommendations))
+        {
+            <div class="advice-section">
+                <h5 class="advice-title"><span class="me-2">🥗</span> Beslenme Rehberi</h5>
+                <div class="advice-content">@Model.DietRecommendations</div>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.GeneralAdvice))
+        {
+            <div class="advice-section">
+                <h5 class="advice-title"><span class="me-2">💡</span> Yaşam Tarzı Önerileri</h5>
+                <div class="advice-content">@Model.GeneralAdvice</div>
+            </div>
+        }
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 pt-4 border-top">
+        <a asp-action="Create" class="btn-lion-dark">Yeni Analiz Yap</a>
+        <a asp-action="MyRecommendations" class="btn-lion-outline">Tüm Kayıtlarım</a>
+        <a asp-controller="User" asp-action="Index" class="btn-lion-outline">Panele Dön</a>
+    </div>
+</div>

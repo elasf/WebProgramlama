@@ -1,51 +1,132 @@
 @{
-    ViewData["Title"] = "Yardım ve SSS";
+    ViewData["Title"] = "Yardım - LionGym";
 }
 
-<h2>Yardım ve Sıkça Sorulan Sorular</h2>
-<hr />
+<style>
+    body {
+        background-color: #ffffff;
+        color: #333;
+    }
 
-<div class="accordion" id="faqAccordion">
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="q1">
-      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#a1">
-        Randevu nasıl alınır?
-      </button>
-    </h2>
-    <div id="a1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-      <div class="accordion-body">
-        Kullanıcı panelindeki “Randevu Al” butonuyla hizmet ve eğitmen seçip tarih/saat belirleyin.
-      </div>
-    </div>
-  </div>
+    .help-container {
+        max-width: 800px;
+        margin-top: 50px;
+    }
 
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="q2">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a2">
-        Randevu iptal koşulları
-      </button>
-    </h2>
-    <div id="a2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-      <div class="accordion-body">
-        Randevularınızı “Randevularım” sayfasından iptal edebilirsiniz. İptal süresi ve cezalar salon politikalarına göre değişebilir.
-      </div>
-    </div>
-  </div>
+    /* Accordion Sadeleştirme */
+    .accordion-item {
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+        background: transparent;
+    }
 
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="q3">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a3">
-        İletişim
-      </button>
-    </h2>
-    <div id="a3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-      <div class="accordion-body">
-        Sorularınız için e-posta: support@example.com veya telefon: 0 (xxx) xxx xx xx
-      </div>
+    .accordion-button {
+        background-color: transparent !important;
+        color: #111 !important;
+        font-weight: 700;
+        padding: 25px 10px;
+        box-shadow: none !important;
+        border: none;
+    }
+
+        .accordion-button:not(.collapsed) {
+            color: #ff6b00 !important; /* Açıldığında başlık turuncu olsun */
+        }
+
+        .accordion-button::after {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23999'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+        }
+
+    .accordion-body {
+        padding: 0 10px 30px 10px;
+        color: #666;
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+
+    .contact-box {
+        background-color: #fafafa;
+        border-radius: 12px;
+        padding: 30px;
+        margin-top: 50px;
+        text-align: center;
+    }
+
+    .section-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #999;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 30px;
+    }
+</style>
+
+<div class="container help-container">
+    <div class="mb-5 text-center text-md-start">
+        <h2 class="fw-bold mb-1">Yardım & Destek</h2>
+        <p class="text-muted small">Merak ettiklerinizi burada bulabilir, bulamazsanız bize ulaşabilirsiniz.</p>
     </div>
-  </div>
+
+    <span class="section-title border-bottom pb-2">Sıkça Sorulan Sorular</span>
+
+    <div class="accordion" id="faqAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="q1">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#a1">
+                    Randevu nasıl alınır?
+                </button>
+            </h2>
+            <div id="a1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    LionGym üzerinden randevu almak oldukça basittir. <strong>Kullanıcı Paneli</strong>'nde yer alan "Randevu Al" butonuna tıklayarak, almak istediğiniz hizmeti ve çalışmak istediğiniz eğitmeni seçip, takvimden size uygun bir saat dilimine tıklamanız yeterlidir.
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="q2">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a2">
+                    Randevu iptal ve değişiklik koşulları nelerdir?
+                </button>
+            </h2>
+            <div id="a2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Planlarınız değiştiyse "Randevularım" sayfasından randevunuzu iptal edebilir veya "Düzenle" seçeneğiyle saati güncelleyebilirsiniz. Salonumuzun doluluk oranını korumak adına, değişikliklerin en az 2 saat önceden yapılmasını rica ederiz.
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="q3">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a3">
+                    AI Önerileri sistemi nasıl çalışır?
+                </button>
+            </h2>
+            <div id="a3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    Yapay zeka destekli öneri sistemimiz, profil bilgileriniz ve geçmiş antrenman tercihlerinize dayanarak size özel egzersiz rotaları çizer. Bu bölüme paneldeki "AI Önerileri" kısmından ulaşabilirsiniz.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="contact-box shadow-sm">
+        <h5 class="fw-bold mb-3">Hala yardıma mı ihtiyacınız var?</h5>
+        <div class="d-flex justify-content-center gap-4 flex-wrap">
+            <div class="small">
+                <i class="fas fa-envelope text-orange me-1"></i> support@liongym.com
+            </div>
+            <div class="small">
+                <i class="fas fa-phone text-orange me-1"></i> 0212 XXX XX XX
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5 text-center">
+        <a asp-controller="User" asp-action="Index" class="text-muted text-decoration-none small">
+            <i class="fas fa-arrow-left me-1"></i> Panele Geri Dön
+        </a>
+    </div>
 </div>
-
-<hr />
-<a asp-controller="User" asp-action="Index" class="btn btn-outline-secondary">Panele Dön</a>
-

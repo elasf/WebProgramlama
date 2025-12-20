@@ -1,71 +1,203 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - odev1</title>
+    <title>@ViewData["Title"] - LionGym</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/odev1.styles.css" asp-append-version="true" />
+
+    <style>
+        :root {
+            --lion-orange: #ff6b00;
+            --lion-dark: #111111;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #ffffff;
+            color: var(--lion-dark);
+        }
+
+        /* Navbar Modernizasyonu */
+        .navbar {
+            padding: 20px 0;
+            transition: all 0.3s;
+            background: #fff !important;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            color: var(--lion-dark) !important;
+        }
+
+            .navbar-brand span {
+                color: var(--lion-orange);
+            }
+
+        .nav-link {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #555 !important;
+            padding: 8px 15px !important;
+            transition: color 0.2s;
+        }
+
+            .nav-link:hover {
+                color: var(--lion-orange) !important;
+            }
+
+        /* Admin Dropdown Özel Stil */
+        .admin-dropdown-toggle {
+            background-color: #fff1e6;
+            color: var(--lion-orange) !important;
+            border-radius: 8px;
+            margin: 0 5px;
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        .dropdown-item {
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 10px 15px;
+            font-size: 0.85rem;
+        }
+
+            .dropdown-item:hover {
+                background-color: #fafafa;
+                color: var(--lion-orange);
+            }
+
+        /* Footer */
+        footer {
+            background-color: #fafafa;
+            padding: 60px 0 30px;
+            margin-top: 80px;
+        }
+
+        .footer-brand {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--lion-dark);
+            text-decoration: none;
+        }
+
+        .footer-link {
+            color: #777;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+
+            .footer-link:hover {
+                color: var(--lion-orange);
+            }
+    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">LionGym</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-lg navbar-light border-bottom sticky-top">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    LION<span>GYM</span>
+                </a>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 ms-lg-4">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Anasayfa</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Anasayfa</a>
                         </li>
-                        
-                        @if (User.IsInRole("user"))
+
+                        @if (User.Identity.IsAuthenticated)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-primary" asp-controller="User" asp-action="Index">Panel</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="TrainerCatalog">Eğitmen Kadromuz</a>
-                            </li>
+                            @if (User.IsInRole("user"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="User" asp-action="Index">Panelim</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Home" asp-action="TrainerCatalog">Eğitmenler</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="AIRecommendation" asp-action="Create">AI Önerisi</a>
+                                </li>
+                            }
+
+                            @if (User.IsInRole("admin"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle admin-dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-shield-halved me-1"></i> Yönetim
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Index">Dashboard</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Trainers">Antrenör Yönetimi</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Members">Üye Listesi</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Services">Hizmet Yönetimi</a></li>
+                                    </ul>
+                                </li>
+                            }
                         }
-                        @if (User.IsInRole("admin"))
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-danger fw-bold" href="#" role="button" data-bs-toggle="dropdown">
-                                    YÖNETİM PANELİ
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" asp-controller="TrainerManage" asp-action="Index">Antrenör Ekle</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="MemberList">Üyeleri listele</a></li>
-                                    <li ><a class="dropdown-item" asp-controller="Services" asp-action="listServices">Hizmet Yönetimi</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Bize Ulaşın</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Privacy">Bize Ulaşın</a>
                         </li>
                     </ul>
-                    <partial name="_LoginPartial" />
+                    <div class="d-flex align-items-center">
+                        <partial name="_LoginPartial" />
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+
+    <div class="container my-5">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="border-top">
         <div class="container">
-            &copy; 2025 - odev1 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row g-4 mb-5">
+                <div class="col-lg-4">
+                    <a class="footer-brand mb-3 d-block" href="#">LION<span>GYM</span></a>
+                    <p class="text-muted small">Gücünü keşfet, sınırlarını zorla. Yapay zeka destekli antrenman ve beslenme planlarıyla geleceğin fitness deneyimi.</p>
+                </div>
+                <div class="col-lg-2 ms-lg-auto">
+                    <h6 class="fw-bold mb-3">Hızlı Bağlantılar</h6>
+                    <ul class="list-unstyled">
+                        <li><a class="footer-link" asp-controller="Home" asp-action="Index">Anasayfa</a></li>
+                        <li><a class="footer-link" asp-controller="Home" asp-action="Privacy">Gizlilik</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h6 class="fw-bold mb-3">İletişim</h6>
+                    <p class="text-muted small mb-1">info@liongym.com</p>
+                    <p class="text-muted small">Sakarya, Türkiye</p>
+                </div>
+            </div>
+            <div class="border-top pt-4 text-center">
+                <p class="text-muted small mb-0">&copy; @DateTime.Now.Year - LionGym. Tüm hakları saklıdır.</p>
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

@@ -1,82 +1,163 @@
 @model odev1.ViewModels.AIRecommendationViewModel
 @{
-    ViewData["Title"] = "AI Önerileri Al";
+    ViewData["Title"] = "AI Önerileri - LionGym";
 }
 
-<h2>AI ile Kişiselleştirilmiş Öneriler Al</h2>
-<p class="text-muted">Boy, kilo, vücut tipi ve hedefinize göre egzersiz ve diyet önerileri alın.</p>
-<hr />
+<style>
+    body {
+        background-color: #ffffff;
+        color: #333;
+    }
 
-@if (TempData["error"] != null)
-{
-    <div class="alert alert-danger">@TempData["error"]</div>
-}
+    .ai-container {
+        max-width: 650px;
+        margin-top: 40px;
+    }
 
-<form asp-action="Create" method="post" enctype="multipart/form-data" class="card card-body">
-    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    .ai-card {
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 35px;
+        background-color: #fff;
+    }
 
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label asp-for="Height" class="form-label"></label>
-            <input asp-for="Height" class="form-control" placeholder="Örn: 175" />
-            <span asp-validation-for="Height" class="text-danger"></span>
+    .section-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #999;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 25px;
+    }
+
+    /* Giriş Elemanları */
+    .custom-input, .custom-select {
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 12px;
+        background-color: #fafafa;
+        transition: all 0.2s;
+        font-size: 0.95rem;
+    }
+
+        .custom-input:focus, .custom-select:focus {
+            background-color: #fff;
+            border-color: #ff6b00; /* Kendi turuncumuz */
+            box-shadow: none;
+            outline: none;
+        }
+
+    /* LionGym Buton Stili */
+    .btn-lion-ai {
+        background-color: #111;
+        color: white;
+        border: none;
+        padding: 15px 35px;
+        border-radius: 8px;
+        font-weight: 700;
+        transition: all 0.2s;
+    }
+
+        .btn-lion-ai:hover {
+            background-color: #ff6b00;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    /* Bilgi Kutusu - Sade Turuncu Vurgulu */
+    .ai-note {
+        background-color: #fff3e0;
+        border-left: 4px solid #ff6b00;
+        padding: 15px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: #e65100;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #555;
+    }
+</style>
+
+<div class="container ai-container">
+    <div class="mb-5">
+        <h2 class="fw-bold mb-1">AI Analizi 🤖</h2>
+        <p class="text-muted small">Vücut tipine ve hedeflerine göre en doğru rotayı çizelim.</p>
+    </div>
+
+    @if (TempData["error"] != null)
+    {
+        <div class="alert alert-danger border-0 small mb-4">
+            @TempData["error"]
         </div>
+    }
 
-        <div class="col-md-6 mb-3">
-            <label asp-for="Weight" class="form-label"></label>
-            <input asp-for="Weight" class="form-control" placeholder="Örn: 70" />
-            <span asp-validation-for="Weight" class="text-danger"></span>
-        </div>
+    <div class="ai-card shadow-sm">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
+            <span class="section-title border-bottom pb-2">Fiziksel Veriler</span>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <label asp-for="Height" class="form-label">Boy (cm)</label>
+                    <input asp-for="Height" class="form-control custom-input" placeholder="Örn: 185" />
+                    <span asp-validation-for="Height" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Weight" class="form-label">Kilo (kg)</label>
+                    <input asp-for="Weight" class="form-control custom-input" placeholder="Örn: 80" />
+                    <span asp-validation-for="Weight" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <label asp-for="BodyType" class="form-label">Vücut Tipi</label>
+                    <select asp-for="BodyType" class="form-select custom-select">
+                        <option value="">Seçiniz...</option>
+                        <option value="ectomorph">Ektomorf</option>
+                        <option value="mesomorph">Mezomorf</option>
+                        <option value="endomorph">Endomorf</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Goal" class="form-label">Hedef</label>
+                    <select asp-for="Goal" class="form-select custom-select">
+                        <option value="">Seçiniz...</option>
+                        <option value="weight_loss">Kilo Verme</option>
+                        <option value="muscle_gain">Kas Kütlesi</option>
+                        <option value="general_fitness">Kondisyon</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Photo" class="form-label">Fotoğraf (Opsiyonel)</label>
+                <input asp-for="Photo" type="file" class="form-control custom-input" accept="image/*" />
+                <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Görsel analiz için opsiyonel yükleyebilirsiniz.</small>
+            </div>
+
+            <div class="ai-note mb-5">
+                <i class="fas fa-lightbulb me-2"></i>
+                Hangi bölgelere odaklanmak istediğinizi belirtmek için tüm alanları doldurmanız önerilir.
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between pt-4 border-top">
+                <a asp-controller="User" asp-action="Index" class="text-muted text-decoration-none small">Geri Dön</a>
+                <button class="btn btn-lion-ai" type="submit">
+                    ÖNERİLERİ OLUŞTUR
+                </button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label asp-for="BodyType" class="form-label"></label>
-            <select asp-for="BodyType" class="form-select">
-                <option value="">Seçiniz...</option>
-                <option value="ectomorph">Ektomorf (İnce, uzun)</option>
-                <option value="mesomorph">Mezomorf (Kaslı, atletik)</option>
-                <option value="endomorph">Endomorf (Yuvarlak, yumuşak)</option>
-            </select>
-            <span asp-validation-for="BodyType" class="text-danger"></span>
-        </div>
-
-        <div class="col-md-6 mb-3">
-            <label asp-for="Goal" class="form-label"></label>
-            <select asp-for="Goal" class="form-select">
-                <option value="">Seçiniz...</option>
-                <option value="weight_loss">Kilo Verme</option>
-                <option value="muscle_gain">Kas Geliştirme</option>
-                <option value="general_fitness">Genel Fitness</option>
-                <option value="endurance">Dayanıklılık Artırma</option>
-                <option value="flexibility">Esneklik Geliştirme</option>
-            </select>
-            <span asp-validation-for="Goal" class="text-danger"></span>
-        </div>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Photo" class="form-label"></label>
-        <input asp-for="Photo" type="file" class="form-control" accept="image/*" />
-        <small class="form-text text-muted">Opsiyonel: Vücut fotoğrafı yükleyebilirsiniz (JPG, PNG)</small>
-        <span asp-validation-for="Photo" class="text-danger"></span>
-    </div>
-
-    <div class="alert alert-info">
-        <strong>Not:</strong> En az boy veya kilo bilgisinden birini girmeniz önerilir. Tüm bilgileri doldurduğunuzda daha kişiselleştirilmiş öneriler alırsınız.
-    </div>
-
-    <div class="d-flex gap-2">
-        <button class="btn btn-primary" type="submit">
-            <i class="bi bi-robot"></i> AI Önerileri Al
-        </button>
-        <a asp-controller="User" asp-action="Index" class="btn btn-outline-secondary">İptal</a>
-    </div>
-
-    @Html.AntiForgeryToken()
-</form>
-
-@section Scripts{
+@section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
-

@@ -1,64 +1,162 @@
 ﻿@model odev1.Models.ViewModels.TrainerRegisterViewModel
 
 @{
-    ViewData["Title"] = "createTrainer";
+    ViewData["Title"] = "Eğitmen Kaydı - LionGym";
 }
 
-<h1>createTrainer</h1>
+<style>
+    body {
+        background-color: #ffffff;
+        color: #333;
+    }
 
-<h4>TrainerRegisterViewModel</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+    .admin-container {
+        max-width: 800px;
+        margin-top: 40px;
+    }
+
+    .form-card {
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 40px;
+        background-color: #fff;
+    }
+
+    .section-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #999;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 25px;
+    }
+
+    .custom-input {
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 12px;
+        background-color: #fafafa;
+        transition: all 0.2s;
+        font-size: 0.95rem;
+    }
+
+        .custom-input:focus {
+            background-color: #fff;
+            border-color: #ff6b00;
+            box-shadow: none;
+            outline: none;
+        }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #555;
+        margin-bottom: 8px;
+    }
+
+    .btn-create {
+        background-color: #111;
+        color: white;
+        border: none;
+        padding: 14px 40px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+        .btn-create:hover {
+            background-color: #ff6b00;
+            color: white;
+        }
+
+    .info-box {
+        background-color: #fff8f0;
+        border-left: 4px solid #ff6b00;
+        padding: 15px;
+        font-size: 0.85rem;
+        color: #e65100;
+        border-radius: 0 8px 8px 0;
+    }
+</style>
+
+<div class="container admin-container py-5">
+    <div class="mb-5 text-center text-md-start">
+        <h2 class="fw-bold mb-1">Yeni Eğitmen Tanımla</h2>
+        <p class="text-muted small">Sisteme yeni bir uzman eğitmen ekleyerek kadroyu genişletin.</p>
+    </div>
+
+    <div class="form-card shadow-sm">
         <form asp-action="createTrainer" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             @Html.AntiForgeryToken()
-            <div class="form-group">
-                <label asp-for="email" class="control-label"></label>
-                <input asp-for="email" class="form-control" />
-                <span asp-validation-for="email" class="text-danger"></span>
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-4"></div>
+
+            <span class="section-title border-bottom pb-2">Erişim Bilgileri</span>
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <label asp-for="email" class="form-label">E-posta Adresi</label>
+                    <input asp-for="email" class="form-control custom-input" placeholder="ornek@liongym.com" />
+                    <span asp-validation-for="email" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="password" class="form-label">Şifre</label>
+                    <input asp-for="password" type="password" class="form-control custom-input" placeholder="••••••••" />
+                    <span asp-validation-for="password" class="text-danger small"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="password" class="control-label"></label>
-                <input asp-for="password" class="form-control" />
-                <span asp-validation-for="password" class="text-danger"></span>
+
+            <span class="section-title border-bottom pb-2">Profil Detayları</span>
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <label asp-for="firstName" class="form-label">Ad</label>
+                    <input asp-for="firstName" class="form-control custom-input" />
+                    <span asp-validation-for="firstName" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="lastName" class="form-label">Soyad</label>
+                    <input asp-for="lastName" class="form-control custom-input" />
+                    <span asp-validation-for="lastName" class="text-danger small"></span>
+                </div>
+                <div class="col-md-12">
+                    <label asp-for="phoneNumber" class="form-label">Telefon</label>
+                    <input asp-for="phoneNumber" class="form-control custom-input" placeholder="05XX XXX XX XX" />
+                    <span asp-validation-for="phoneNumber" class="text-danger small"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="firstName" class="control-label"></label>
-                <input asp-for="firstName" class="form-control" />
-                <span asp-validation-for="firstName" class="text-danger"></span>
+
+            <span class="section-title border-bottom pb-2 mt-5">Uzmanlık Alanı</span>
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <label asp-for="experties" class="form-label">Uzmanlık (Expertise)</label>
+                    <input asp-for="experties" class="form-control custom-input" placeholder="Örn: Fitness, Pilates" />
+                    <span asp-validation-for="experties" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="services" class="form-label">Hizmetler (Services)</label>
+                    <input asp-for="services" class="form-control custom-input" placeholder="Örn: Personal Training" />
+                    <span asp-validation-for="services" class="text-danger small"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="lastName" class="control-label"></label>
-                <input asp-for="lastName" class="form-control" />
-                <span asp-validation-for="lastName" class="text-danger"></span>
+
+            <div class="info-box mb-5">
+                <i class="fas fa-info-circle me-1"></i>
+                Eğitmen kaydı tamamlandıktan sonra sisteme giriş yapabilir ve çalışma saatlerini düzenleyebilir.
             </div>
-            <div class="form-group">
-                <label asp-for="phoneNumber" class="control-label"></label>
-                <input asp-for="phoneNumber" class="form-control" />
-                <span asp-validation-for="phoneNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="experties" class="control-label"></label>
-                <input asp-for="experties" class="form-control" />
-                <span asp-validation-for="experties" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="services" class="control-label"></label>
-                <input asp-for="services" class="form-control" />
-                <span asp-validation-for="services" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+
+            <div class="d-flex align-items-center justify-content-between pt-4 border-top">
+                <a asp-action="Index" class="text-muted text-decoration-none small">
+                    <i class="fas fa-arrow-left me-1"></i> Listeye Dön
+                </a>
+                <button type="submit" class="btn btn-create shadow-sm">
+                    EĞİTMENİ OLUŞTUR
+                </button>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
