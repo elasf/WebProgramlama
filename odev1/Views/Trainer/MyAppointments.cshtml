@@ -1,0 +1,171 @@
+﻿@model IEnumerable<odev1.Models.Appointment>
+
+@{
+    ViewData["Title"] = "Takvimim - LionGym";
+}
+
+<style>
+    body {
+        background-color: #ffffff;
+        color: #333;
+    }
+
+    .trainer-container {
+        max-width: 900px;
+        margin-top: 40px;
+    }
+
+    /* Randevu Kartı Tasarımı */
+    .appointment-row {
+        border: 1px solid #f0f0f0;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 15px;
+        transition: all 0.2s ease;
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+    }
+
+        .appointment-row:hover {
+            border-color: #ff6b00;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+    /* Saat Alanı */
+    .time-box {
+        min-width: 110px;
+        text-align: center;
+        border-right: 2px solid #ff6b00;
+        margin-right: 25px;
+        padding-right: 15px;
+    }
+
+    .time-start {
+        font-weight: 800;
+        font-size: 1.3rem;
+        color: #111;
+        display: block;
+        line-height: 1;
+    }
+
+    .time-date {
+        font-size: 0.75rem;
+        color: #999;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin-top: 5px;
+        display: block;
+    }
+
+    /* Üye Bilgisi */
+    .member-info {
+        flex-grow: 1;
+    }
+
+    .member-name {
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: #111;
+        margin-bottom: 2px;
+    }
+
+    .service-tag {
+        font-size: 0.75rem;
+        background-color: #f5f5f5;
+        color: #666;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 600;
+    }
+
+    /* Durum Rozetleri */
+    .status-badge {
+        font-size: 0.7rem;
+        font-weight: 800;
+        padding: 6px 12px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-upcoming {
+        background-color: #fff3e0;
+        color: #ff6b00;
+    }
+
+    .status-completed {
+        background-color: #f5f5f5;
+        color: #999;
+    }
+</style>
+
+<div class="container trainer-container py-5">
+    <div class="mb-5 text-center text-md-start">
+        <h2 class="fw-bold mb-1">Antrenman Takvimim 📅</h2>
+        <p class="text-muted small">Sayın @User.Identity.Name, güncel randevu listeniz aşağıdadır.</p>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center py-5 border rounded-4 bg-light shadow-sm">
+            <div class="mb-3" style="font-size: 3rem;">🕊️</div>
+            <h5 class="fw-bold">Henüz bir randevunuz bulunmuyor.</h5>
+            <p class="text-muted small">Yeni bir randevu oluşturulduğunda burada görünecektir.</p>
+        </div>
+    }
+    else
+    {
+        @foreach (var app in Model)
+        {
+            <div class="appointment-row shadow-sm">
+                <div class="time-box">
+                    <span class="time-start">
+                        @* StartTime TimeSpan formatını HH:mm olarak yazdırıyoruz *@
+                        @app.StartTime.ToString(@"hh\:mm")
+                    </span>
+                    <span class="time-date">@app.AppointmentDate.ToString("dd MMM")</span>
+                </div>
+
+                <div class="member-info">
+                    <div class="member-name">
+                        @if (app.user != null)
+                        {
+                            @($"{app.user.userAd} {app.user.userSoyad}")
+                        }
+                        else
+                        {
+                            <span>Bilinmeyen Üye</span>
+                        }
+                    </div>
+                    <div>
+                        <span class="service-tag">@(app.service?.name ?? "Genel Spor")</span>
+                        <span class="ms-2 text-muted small"><i class="far fa-clock me-1"></i> @(app.service?.duration ?? 0) dk</span>
+                    </div>
+                </div>
+
+                <div class="text-end">
+                    @{
+                        // Tarih ve saati birleştirip tam bir DateTime oluşturuyoruz
+                        var fullAppointmentDateTime = app.AppointmentDate.Date.Add(app.StartTime);
+                    }
+
+                    @if (fullAppointmentDateTime > DateTime.Now)
+                    {
+                        <span class="status-badge status-upcoming">Yaklaşıyor</span>
+                    }
+                    else
+                    {
+                        <span class="status-badge status-completed">Geçmiş</span>
+                    }
+                </div>
+            </div>
+        }
+    }
+
+    <div class="mt-5 pt-4 text-center border-top">
+        <a asp-controller="Home" asp-action="Index" class="text-muted text-decoration-none small">
+            <i class="fas fa-arrow-left me-1"></i> Anasayfaya Dön
+        </a>
+    </div>
+</div>

@@ -136,7 +136,14 @@
                                     <a class="nav-link" asp-controller="AIRecommendation" asp-action="Create">AI Önerisi</a>
                                 </li>
                             }
-
+                            @if (User.IsInRole("trainer"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link fw-bold" asp-controller="Trainer" asp-action="MyAppointments" style="color: #ff6b00 !important;">
+                                        <i class="fas fa-calendar-check me-1"></i> TAKVİMİM
+                                    </a>
+                                </li>
+                            }
                             @if (User.IsInRole("admin"))
                             {
                                 <li class="nav-item dropdown">
