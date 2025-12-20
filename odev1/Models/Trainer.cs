@@ -11,7 +11,6 @@ namespace odev1.Models
         public string fullName { get; set; }
 
         public string userId { get; set; }
-        public UserDetails user { get; set; }
 
         
         

@@ -1,0 +1,41 @@
+@model odev1.ViewModels.AppointmentRescheduleViewModel
+@{
+    ViewData["Title"] = "Randevuyu Yeniden Planla";
+}
+
+<h2>Randevuyu Yeniden Planla</h2>
+<hr />
+
+<div class="mb-3">
+    <strong>Hizmet:</strong> @Model.ServiceName (@Model.ServiceDuration dk)<br />
+    <strong>Eğitmen:</strong> @Model.TrainerName
+    <hr />
+</div>
+
+<form asp-action="Reschedule" method="post">
+    <input type="hidden" asp-for="AppointmentId" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="AppointmentDate" class="form-label"></label>
+            <input asp-for="AppointmentDate" class="form-control" type="date" />
+            <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="StartTime" class="form-label"></label>
+            <input asp-for="StartTime" class="form-control" type="time" />
+            <span asp-validation-for="StartTime" class="text-danger"></span>
+        </div>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Kaydet</button>
+    <a asp-action="My" class="btn btn-outline-secondary">İptal</a>
+
+    @Html.AntiForgeryToken()
+</form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}
+

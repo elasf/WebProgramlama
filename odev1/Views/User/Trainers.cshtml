@@ -1,0 +1,25 @@
+@model IEnumerable<odev1.Models.Trainer>
+@{
+    ViewData["Title"] = "Eğitmenler";
+}
+
+<h2>Eğitmenler</h2>
+<hr />
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Ad Soyad</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach(var t in Model)
+    {
+        <tr>
+            <td>@t.fullName</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<a asp-controller="User" asp-action="Book" class="btn btn-primary">Randevu Al</a>
+

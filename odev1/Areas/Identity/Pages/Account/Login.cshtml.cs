@@ -132,7 +132,7 @@ namespace odev1.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        return RedirectToAction("Index", "Home"); //normal üye ana sayfaya
+                        return RedirectToAction("Index", "User"); // normal üye: kullanıcı paneline yönlendir
                     }
 
                     _logger.LogInformation("User logged in.");

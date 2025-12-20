@@ -27,14 +27,8 @@ builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
 builder.Services.AddScoped<ITrainerService, TrainerServiceImpl>();   
 builder.Services.AddScoped<ISchedulingQueryService, SchedulingQueryService>();  
 builder.Services.AddScoped<AdminService>();
-<<<<<<< HEAD
 builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<AppointmentService>();
 builder.Services.AddScoped<odev1.Services.TrainerManageService>();
-=======
-builder.Services.AddScoped<AppointmentService>(); 
-builder.Services.AddScoped<TrainerServiceImpl>(); 
->>>>>>> 9c45c3f63b51074bd64e86b63daf0021e20f18d0
 
 var app = builder.Build();
 

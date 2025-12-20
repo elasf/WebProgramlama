@@ -17,7 +17,42 @@ namespace odev1.Services
             _userManager = userManager;
         }
 
-        
+        public async Task<IdentityResult> createTrainerAsync(TrainerRegisterViewModel model)
+        {
+            if (UserExists(model.email))
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "Bu email adresi zaten kayıtlı." });
+            }
+
+            var user = new UserDetails
+            {
+                UserName = model.email,
+                Email = model.email,
+                userAd = model.firstName,
+                userSoyad = model.lastName,
+                PhoneNumber = model.phoneNumber,
+                EmailConfirmed = true
+            };
+
+            var result = await _userManager.CreateAsync(user, model.password);
+            if (!result.Succeeded)
+            {
+                return result;
+            }
+
+            await _userManager.AddToRoleAsync(user, "trainer");
+
+            var trainer = new Trainer
+            {
+                userId = user.Id,
+                fullName = $"{model.firstName} {model.lastName}",
+            };
+
+            await _context.Trainers.AddAsync(trainer);
+            await _context.SaveChangesAsync();
+
+            return IdentityResult.Success;
+        }
 
         public List<Member> getAllMembers()
         {

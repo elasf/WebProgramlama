@@ -1,0 +1,42 @@
+@{
+    ViewData["Title"] = "Kullanıcı Paneli";
+}
+
+<h2>Kullanıcı Paneli</h2>
+<hr />
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card border-primary">
+            <div class="card-body">
+                <h5 class="card-title">Yaklaşan Randevular</h5>
+                <p class="card-text display-6">@ViewBag.UpcomingCount</p>
+                <a asp-controller="User" asp-action="MyAppointments" class="btn btn-primary">Randevularım</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-success">
+            <div class="card-body">
+                <h5 class="card-title">Hizmetler</h5>
+                <p class="card-text display-6">@ViewBag.ServiceCount</p>
+                <a asp-controller="User" asp-action="Services" class="btn btn-success">Hizmetleri Gör</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-info">
+            <div class="card-body">
+                <h5 class="card-title">Eğitmenler</h5>
+                <p class="card-text display-6">@ViewBag.TrainerCount</p>
+                <a asp-controller="User" asp-action="Trainers" class="btn btn-info text-white">Eğitmenleri Gör</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr />
+<div class="d-flex gap-2">
+    <a asp-controller="User" asp-action="Book" class="btn btn-primary">Randevu Al</a>
+    <a asp-controller="User" asp-action="MyAppointments" class="btn btn-outline-secondary">Randevularım</a>
+</div>
+

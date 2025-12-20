@@ -1,0 +1,29 @@
+@model IEnumerable<odev1.Models.Service>
+@{
+    ViewData["Title"] = "Hizmetler";
+}
+
+<h2>Hizmetler</h2>
+<hr />
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Ad</th>
+            <th>Süre (dk)</th>
+            <th>Ücret</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach(var s in Model)
+    {
+        <tr>
+            <td>@s.name</td>
+            <td>@s.duration</td>
+            <td>@s.price.ToString("C")</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<a asp-controller="User" asp-action="Book" class="btn btn-primary">Randevu Al</a>
+

@@ -14,6 +14,7 @@
             <th>Saat</th>
             <th>Durum</th>
             <th>Ücret</th>
+            <th>İşlemler</th>
         </tr>
     </thead>
     <tbody>
@@ -26,6 +27,17 @@
             <td>@a.StartTime.ToString(@"hh\:mm") - @a.EndTime.ToString(@"hh\:mm")</td>
             <td>@a.Status</td>
             <td>@a.Price.ToString("C")</td>
+            <td class="d-flex gap-2">
+                <a asp-action="Reschedule" asp-route-id="@a.id"
+                   class="btn btn-sm btn-outline-primary @(a.Status == odev1.Models.AppointmentStatus.Cancelled ? "disabled" : "")">Yeniden Planla</a>
+                <form asp-action="Cancel" method="post" onsubmit="return confirm('Randevuyu iptal etmek istiyor musunuz?');">
+                    <input type="hidden" name="id" value="@a.id" />
+                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                            disabled="@(a.Status == odev1.Models.AppointmentStatus.Cancelled ? "disabled" : null)">
+                        İptal
+                    </button>
+                </form>
+            </td>
         </tr>
     }
     </tbody>

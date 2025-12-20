@@ -28,7 +28,7 @@ namespace odev1.Services
             if (!canCreateAppointment(appointment))
                 throw new Exception("Trainer is not available.");
 
-            appointment.Status = AppointmentStatus.Pending;
+            appointment.Status = odev1.Models.AppointmentStatus.Pending;
 
             _context.Appointments.Add(appointment);
             _context.SaveChanges();
@@ -66,7 +66,7 @@ namespace odev1.Services
             if (appointment == null)
                 throw new KeyNotFoundException("Appointment not found.");
 
-            appointment.Status = AppointmentStatus.Cancelled;
+            appointment.Status = odev1.Models.AppointmentStatus.Cancelled;
             _context.SaveChanges();
 
             return appointment;
@@ -124,7 +124,7 @@ namespace odev1.Services
             return _context.Appointments.Any(ap =>
                 ap.trainerId == trainerId &&
                 ap.AppointmentDate.Date == date.Date &&
-                ap.Status != AppointmentStatus.Cancelled &&
+                ap.Status != odev1.Models.AppointmentStatus.Cancelled &&
                 startTime < ap.EndTime &&
                 endTime > ap.StartTime
             );

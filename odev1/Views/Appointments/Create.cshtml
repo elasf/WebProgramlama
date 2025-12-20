@@ -52,7 +52,7 @@
     <button class="btn btn-primary" type="submit">Randevu Oluştur</button>
     <a asp-action="My" class="btn btn-outline-secondary">Randevularım</a>
 
-    <input name="__RequestVerificationToken" type="hidden" value="@Antiforgery.GetTokens(HttpContext).RequestToken" />
+    @Html.AntiForgeryToken()
 </form>
 
 @section Scripts{

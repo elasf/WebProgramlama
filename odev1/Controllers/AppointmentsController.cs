@@ -151,6 +151,106 @@ namespace odev1.Controllers
             return View(items);
         }
 
+        // Randevu iptal
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var ap = await _context.Appointments
+                .FirstOrDefaultAsync(a => a.id == id && a.userId == user.Id);
+            if (ap == null) return NotFound();
+
+            if (ap.Status != odev1.Models.AppointmentStatus.Cancelled)
+            {
+                ap.Status = odev1.Models.AppointmentStatus.Cancelled;
+                await _context.SaveChangesAsync();
+                TempData["success"] = "Randevu iptal edildi.";
+            }
+
+            return RedirectToAction(nameof(My));
+        }
+
+        // Randevu yeniden planla (GET) - aynı servis ve eğitmenle tarih/saat değiştir
+        [HttpGet]
+        public async Task<IActionResult> Reschedule(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var ap = await _context.Appointments
+                .Include(a => a.service)
+                .Include(a => a.trainer)
+                .FirstOrDefaultAsync(a => a.id == id && a.userId == user.Id);
+            if (ap == null) return NotFound();
+
+            var vm = new odev1.ViewModels.AppointmentRescheduleViewModel
+            {
+                AppointmentId = ap.id,
+                AppointmentDate = ap.AppointmentDate,
+                StartTime = ap.StartTime,
+                ServiceName = ap.service?.name ?? "",
+                ServiceDuration = ap.service?.duration ?? 0,
+                TrainerName = ap.trainer?.fullName ?? ""
+            };
+
+            return View(vm);
+        }
+
+        // Randevu yeniden planla (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reschedule(odev1.ViewModels.AppointmentRescheduleViewModel vm)
+        {
+            if (!ModelState.IsValid) return View(vm);
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var ap = await _context.Appointments
+                .Include(a => a.service)
+                .FirstOrDefaultAsync(a => a.id == vm.AppointmentId && a.userId == user.Id);
+            if (ap == null) return NotFound();
+
+            var service = ap.service;
+            if (service == null) return BadRequest();
+
+            var start = vm.StartTime!.Value;
+            var end = start.Add(TimeSpan.FromMinutes(service.duration));
+
+            // uygunluk kontrolü
+            var candidate = new Appointment
+            {
+                id = ap.id,
+                userId = ap.userId,
+                trainerId = ap.trainerId,
+                serviceId = ap.serviceId,
+                AppointmentDate = vm.AppointmentDate!.Value.Date,
+                StartTime = start,
+                EndTime = end
+            };
+
+            if (!_appointmentService.canCreateAppointment(candidate))
+            {
+                ModelState.AddModelError(string.Empty, "Seçilen tarih ve saat dilimi uygun değil.");
+                // Görsel bilgiler
+                vm.ServiceName = service.name;
+                vm.ServiceDuration = service.duration;
+                return View(vm);
+            }
+
+            // güncelle
+            ap.AppointmentDate = candidate.AppointmentDate;
+            ap.StartTime = candidate.StartTime;
+            ap.EndTime = candidate.EndTime;
+            await _context.SaveChangesAsync();
+
+            TempData["success"] = "Randevu güncellendi.";
+            return RedirectToAction(nameof(My));
+        }
+
         // AJAX: Seçilen hizmete göre eğitmenleri getir
         [HttpGet]
         public async Task<IActionResult> TrainersForService(int serviceId)

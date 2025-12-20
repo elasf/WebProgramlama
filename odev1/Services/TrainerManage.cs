@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using odev1.Data;
 using odev1.Models;
 using odev1.Models.ViewModels;
+using TrainerServiceEntity = odev1.Models.TrainerService;
 
 namespace odev1.Services
 {
@@ -130,7 +131,7 @@ namespace odev1.Services
             {
                 foreach (var sId in serviceIds)
                 {
-                    _context.TrainerServices.Add(new TrainerService { trainerId = trainerId, serviceId = sId });
+                    _context.TrainerServices.Add(new TrainerServiceEntity { trainerId = trainerId, serviceId = sId });
                 }
             }
 
