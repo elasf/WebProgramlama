@@ -1,0 +1,70 @@
+@model List<odev1.ViewModels.AIRecommendationResultViewModel>
+@{
+    ViewData["Title"] = "AI Önerilerim";
+}
+
+<h2>AI Önerilerim</h2>
+<hr />
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        <strong>Henüz AI önerisi almadınız.</strong>
+        <a asp-action="Create" class="alert-link">İlk önerinizi almak için tıklayın</a>
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var recommendation in Model)
+        {
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>@recommendation.CreatedAt.ToString("dd.MM.yyyy HH:mm")</span>
+                        <a asp-action="Details" asp-route-id="@recommendation.Id" class="btn btn-sm btn-primary">Detay</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-2">
+                            @if (recommendation.Height.HasValue || recommendation.Weight.HasValue)
+                            {
+                                <small class="text-muted">
+                                    @if (recommendation.Height.HasValue)
+                                    {
+                                        <span>Boy: @recommendation.Height cm</span>
+                                    }
+                                    @if (recommendation.Weight.HasValue)
+                                    {
+                                        <span> | Kilo: @recommendation.Weight kg</span>
+                                    }
+                                </small>
+                            }
+                        </div>
+                        @if (!string.IsNullOrEmpty(recommendation.Goal))
+                        {
+                            <span class="badge bg-primary">@recommendation.Goal</span>
+                        }
+                        @if (!string.IsNullOrEmpty(recommendation.BodyType))
+                        {
+                            <span class="badge bg-secondary">@recommendation.BodyType</span>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(recommendation.ExerciseRecommendations))
+                        {
+                            <div class="mt-3">
+                                <strong>Egzersiz:</strong>
+                                <p class="text-truncate">@recommendation.ExerciseRecommendations.Substring(0, Math.Min(100, recommendation.ExerciseRecommendations.Length))...</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<div class="mt-3">
+    <a asp-action="Create" class="btn btn-primary">Yeni Öneri Al</a>
+    <a asp-controller="User" asp-action="Index" class="btn btn-outline-secondary">Panele Dön</a>
+</div>
+

@@ -23,6 +23,9 @@ namespace odev1.Models
 
 
         // randevular eklenecek
-        // public ICollection<Appointment> Appointments { get; set; } 
+        // public ICollection<Appointment> Appointments { get; set; }
+        
+        // AI önerileri
+        public ICollection<AIRecommendation> AIRecommendations { get; set; } 
     }
 }

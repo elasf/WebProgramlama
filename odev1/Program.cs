@@ -26,9 +26,13 @@ builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();   
 builder.Services.AddScoped<ITrainerService, TrainerServiceImpl>();   
 builder.Services.AddScoped<ISchedulingQueryService, SchedulingQueryService>();  
+builder.Services.AddScoped<odev1.Services.Interfaces.IAIRecommendationService, odev1.Services.AIRecommendationService>();
 builder.Services.AddScoped<AdminService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<odev1.Services.TrainerManageService>();
+
+// HttpClient için factory ekle (AI servisi için)
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 

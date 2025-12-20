@@ -1,0 +1,112 @@
+@model odev1.ViewModels.AIRecommendationResultViewModel
+@{
+    ViewData["Title"] = "AI Önerileri";
+}
+
+<h2>AI Önerileriniz</h2>
+<hr />
+
+@if (TempData["success"] != null)
+{
+    <div class="alert alert-success">@TempData["success"]</div>
+}
+
+<div class="row">
+    @if (!string.IsNullOrEmpty(Model.PhotoPath))
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-header">Yüklenen Fotoğraf</div>
+                <div class="card-body">
+                    <img src="@Model.PhotoPath" alt="Kullanıcı fotoğrafı" class="img-fluid rounded" />
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="@(string.IsNullOrEmpty(Model.PhotoPath) ? "col-12" : "col-md-8")">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Bilgileriniz</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @if (Model.Height.HasValue)
+                    {
+                        <div class="col-md-3">
+                            <strong>Boy:</strong> @Model.Height cm
+                        </div>
+                    }
+                    @if (Model.Weight.HasValue)
+                    {
+                        <div class="col-md-3">
+                            <strong>Kilo:</strong> @Model.Weight kg
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.BodyType))
+                    {
+                        <div class="col-md-3">
+                            <strong>Vücut Tipi:</strong> @Model.BodyType
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Goal))
+                    {
+                        <div class="col-md-3">
+                            <strong>Hedef:</strong> @Model.Goal
+                        </div>
+                    }
+                </div>
+                <small class="text-muted">Oluşturulma: @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.ExerciseRecommendations))
+{
+    <div class="card mb-3">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">💪 Egzersiz Önerileri</h5>
+        </div>
+        <div class="card-body">
+            <div class="whitespace-pre-line">@Model.ExerciseRecommendations</div>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(Model.DietRecommendations))
+{
+    <div class="card mb-3">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">🥗 Beslenme Önerileri</h5>
+        </div>
+        <div class="card-body">
+            <div class="whitespace-pre-line">@Model.DietRecommendations</div>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(Model.GeneralAdvice))
+{
+    <div class="card mb-3">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">💡 Genel Tavsiyeler</h5>
+        </div>
+        <div class="card-body">
+            <div class="whitespace-pre-line">@Model.GeneralAdvice</div>
+        </div>
+    </div>
+}
+
+<div class="d-flex gap-2">
+    <a asp-action="Create" class="btn btn-primary">Yeni Öneri Al</a>
+    <a asp-action="MyRecommendations" class="btn btn-outline-secondary">Tüm Önerilerim</a>
+    <a asp-controller="User" asp-action="Index" class="btn btn-outline-secondary">Panele Dön</a>
+</div>
+
+<style>
+    .whitespace-pre-line {
+        white-space: pre-line;
+    }
+</style>
+

@@ -1,0 +1,82 @@
+@model odev1.ViewModels.AIRecommendationViewModel
+@{
+    ViewData["Title"] = "AI Önerileri Al";
+}
+
+<h2>AI ile Kişiselleştirilmiş Öneriler Al</h2>
+<p class="text-muted">Boy, kilo, vücut tipi ve hedefinize göre egzersiz ve diyet önerileri alın.</p>
+<hr />
+
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger">@TempData["error"]</div>
+}
+
+<form asp-action="Create" method="post" enctype="multipart/form-data" class="card card-body">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="Height" class="form-label"></label>
+            <input asp-for="Height" class="form-control" placeholder="Örn: 175" />
+            <span asp-validation-for="Height" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="Weight" class="form-label"></label>
+            <input asp-for="Weight" class="form-control" placeholder="Örn: 70" />
+            <span asp-validation-for="Weight" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="BodyType" class="form-label"></label>
+            <select asp-for="BodyType" class="form-select">
+                <option value="">Seçiniz...</option>
+                <option value="ectomorph">Ektomorf (İnce, uzun)</option>
+                <option value="mesomorph">Mezomorf (Kaslı, atletik)</option>
+                <option value="endomorph">Endomorf (Yuvarlak, yumuşak)</option>
+            </select>
+            <span asp-validation-for="BodyType" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="Goal" class="form-label"></label>
+            <select asp-for="Goal" class="form-select">
+                <option value="">Seçiniz...</option>
+                <option value="weight_loss">Kilo Verme</option>
+                <option value="muscle_gain">Kas Geliştirme</option>
+                <option value="general_fitness">Genel Fitness</option>
+                <option value="endurance">Dayanıklılık Artırma</option>
+                <option value="flexibility">Esneklik Geliştirme</option>
+            </select>
+            <span asp-validation-for="Goal" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Photo" class="form-label"></label>
+        <input asp-for="Photo" type="file" class="form-control" accept="image/*" />
+        <small class="form-text text-muted">Opsiyonel: Vücut fotoğrafı yükleyebilirsiniz (JPG, PNG)</small>
+        <span asp-validation-for="Photo" class="text-danger"></span>
+    </div>
+
+    <div class="alert alert-info">
+        <strong>Not:</strong> En az boy veya kilo bilgisinden birini girmeniz önerilir. Tüm bilgileri doldurduğunuzda daha kişiselleştirilmiş öneriler alırsınız.
+    </div>
+
+    <div class="d-flex gap-2">
+        <button class="btn btn-primary" type="submit">
+            <i class="bi bi-robot"></i> AI Önerileri Al
+        </button>
+        <a asp-controller="User" asp-action="Index" class="btn btn-outline-secondary">İptal</a>
+    </div>
+
+    @Html.AntiForgeryToken()
+</form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}
+

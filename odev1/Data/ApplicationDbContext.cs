@@ -25,6 +25,7 @@ namespace odev1.Data
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Member> Members { get; set; }
         public DbSet<ProgressEntry> ProgressEntries { get; set; }
+        public DbSet<AIRecommendation> AIRecommendations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,6 +59,13 @@ namespace odev1.Data
                 .HasOne(ts => ts.service)
                 .WithMany(s => s.trainerService)
                 .HasForeignKey(ts => ts.serviceId);
+
+            // Member <-> AIRecommendation (One-to-Many)
+            modelBuilder.Entity<AIRecommendation>()
+                .HasOne(ai => ai.Member)
+                .WithMany(m => m.AIRecommendations)
+                .HasForeignKey(ai => ai.MemberId)
+                .OnDelete(DeleteBehavior.SetNull); // Member silinirse AI önerileri silinmez, MemberId null olur
         }
     }
 }
