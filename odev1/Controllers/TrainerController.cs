@@ -16,21 +16,45 @@ namespace odev1.Controllers
         {
             _context = context;
         }
-
+        public IActionResult Index()
+        {
+            return RedirectToAction(nameof(MyAppointments));
+        }
+        //takvim kısmı
         public async Task<IActionResult> MyAppointments()
         {
             var userEmail = User.Identity.Name;
 
             var appointments = await _context.Appointments
-                .Include(a => a.user)       // Randevu içindeki UserDetails (Üye Bilgisi)
-                .Include(a => a.service)    // Randevu içindeki Hizmet
-                .Include(a => a.trainer)    // Randevu içindeki Eğitmen
-                    .ThenInclude(t => t.User) // Eğitmenin UserDetails bilgisi (Email kontrolü için)
+                .Include(a => a.user)       
+                .Include(a => a.service)    
+                .Include(a => a.trainer)   
+                    .ThenInclude(t => t.User) 
                 .Where(a => a.trainer.User.Email == userEmail)
                 .OrderByDescending(a => a.AppointmentDate)
                 .ToListAsync();
 
             return View(appointments);
+        }
+        //onaylama
+        //trainerlarımız özenle seçildiği için onaylama işlemlerini kendileri yapıyor öyle de bir kurumuz
+        [HttpPost]
+        public async Task<IActionResult> ApproveAppointment(int id)
+        {
+            var appointment = await _context.Appointments.FindAsync(id);
+
+            if (appointment == null)
+            {
+                return NotFound();
+            }
+
+            
+            appointment.Status = odev1.Models.AppointmentStatus.Approved;
+
+            _context.Update(appointment);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(MyAppointments));
         }
 
     }

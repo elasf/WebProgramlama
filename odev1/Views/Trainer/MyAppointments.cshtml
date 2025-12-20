@@ -11,11 +11,10 @@
     }
 
     .trainer-container {
-        max-width: 900px;
+        max-width: 1000px;
         margin-top: 40px;
     }
 
-    /* Randevu Kartı Tasarımı */
     .appointment-row {
         border: 1px solid #f0f0f0;
         border-radius: 15px;
@@ -25,6 +24,7 @@
         background-color: #fff;
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
     }
 
         .appointment-row:hover {
@@ -32,7 +32,6 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
 
-    /* Saat Alanı */
     .time-box {
         min-width: 110px;
         text-align: center;
@@ -46,7 +45,6 @@
         font-size: 1.3rem;
         color: #111;
         display: block;
-        line-height: 1;
     }
 
     .time-date {
@@ -54,11 +52,8 @@
         color: #999;
         text-transform: uppercase;
         font-weight: 700;
-        margin-top: 5px;
-        display: block;
     }
 
-    /* Üye Bilgisi */
     .member-info {
         flex-grow: 1;
     }
@@ -67,7 +62,6 @@
         font-weight: 700;
         font-size: 1.15rem;
         color: #111;
-        margin-bottom: 2px;
     }
 
     .service-tag {
@@ -79,7 +73,6 @@
         font-weight: 600;
     }
 
-    /* Durum Rozetleri */
     .status-badge {
         font-size: 0.7rem;
         font-weight: 800;
@@ -87,6 +80,7 @@
         border-radius: 20px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        display: inline-block;
     }
 
     .status-upcoming {
@@ -94,36 +88,59 @@
         color: #ff6b00;
     }
 
+    .status-approved {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+    }
+
     .status-completed {
         background-color: #f5f5f5;
         color: #999;
     }
+
+    .status-pending {
+        background-color: #fff9db;
+        color: #f59f00;
+    }
+
+    .btn-approve {
+        background-color: #111;
+        color: white;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        padding: 8px 16px;
+        transition: all 0.2s;
+    }
+
+        .btn-approve:hover {
+            background-color: #ff6b00;
+            color: white;
+            transform: scale(1.05);
+        }
 </style>
 
 <div class="container trainer-container py-5">
-    <div class="mb-5 text-center text-md-start">
+    <div class="mb-5">
         <h2 class="fw-bold mb-1">Antrenman Takvimim 📅</h2>
-        <p class="text-muted small">Sayın @User.Identity.Name, güncel randevu listeniz aşağıdadır.</p>
+        <p class="text-muted small">@User.Identity.Name, bugün odaklanman gereken randevular aşağıda.</p>
     </div>
 
     @if (Model == null || !Model.Any())
     {
-        <div class="text-center py-5 border rounded-4 bg-light shadow-sm">
-            <div class="mb-3" style="font-size: 3rem;">🕊️</div>
-            <h5 class="fw-bold">Henüz bir randevunuz bulunmuyor.</h5>
-            <p class="text-muted small">Yeni bir randevu oluşturulduğunda burada görünecektir.</p>
+        <div class="text-center py-5 border rounded-4 bg-light">
+            <p class="text-muted">Henüz planlanmış bir randevunuz bulunmuyor.</p>
         </div>
     }
     else
     {
         @foreach (var app in Model)
         {
+            var fullAppointmentDateTime = app.AppointmentDate.Date.Add(app.StartTime);
+
             <div class="appointment-row shadow-sm">
                 <div class="time-box">
-                    <span class="time-start">
-                        @* StartTime TimeSpan formatını HH:mm olarak yazdırıyoruz *@
-                        @app.StartTime.ToString(@"hh\:mm")
-                    </span>
+                    <span class="time-start">@app.StartTime.ToString(@"hh\:mm")</span>
                     <span class="time-date">@app.AppointmentDate.ToString("dd MMM")</span>
                 </div>
 
@@ -138,34 +155,35 @@
                             <span>Bilinmeyen Üye</span>
                         }
                     </div>
-                    <div>
-                        <span class="service-tag">@(app.service?.name ?? "Genel Spor")</span>
-                        <span class="ms-2 text-muted small"><i class="far fa-clock me-1"></i> @(app.service?.duration ?? 0) dk</span>
-                    </div>
+                    <span class="service-tag">@(app.service?.name ?? "Hizmet")</span>
+                    <span class="ms-2 text-muted small"><i class="far fa-clock me-1"></i> @(app.service?.duration ?? 0) dk</span>
                 </div>
 
-                <div class="text-end">
-                    @{
-                        // Tarih ve saati birleştirip tam bir DateTime oluşturuyoruz
-                        var fullAppointmentDateTime = app.AppointmentDate.Date.Add(app.StartTime);
-                    }
-
-                    @if (fullAppointmentDateTime > DateTime.Now)
+                <div class="d-flex align-items-center gap-3">
+                    @if (app.Status == odev1.Models.AppointmentStatus.Pending)
                     {
-                        <span class="status-badge status-upcoming">Yaklaşıyor</span>
+                        <span class="status-badge status-pending">Onay Bekliyor</span>
+                        <form asp-action="ApproveAppointment" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@app.id" />
+                            <button type="submit" class="btn btn-approve shadow-sm">
+                                <i class="fas fa-check me-1"></i> ONAYLA
+                            </button>
+                        </form>
                     }
                     else
                     {
-                        <span class="status-badge status-completed">Geçmiş</span>
+                        @if (fullAppointmentDateTime > DateTime.Now)
+                        {
+                            <span class="status-badge status-approved">Onaylandı</span>
+                            <span class="status-badge status-upcoming">Yaklaşıyor</span>
+                        }
+                        else
+                        {
+                            <span class="status-badge status-completed">Geçmiş</span>
+                        }
                     }
                 </div>
             </div>
         }
     }
-
-    <div class="mt-5 pt-4 text-center border-top">
-        <a asp-controller="Home" asp-action="Index" class="text-muted text-decoration-none small">
-            <i class="fas fa-arrow-left me-1"></i> Anasayfaya Dön
-        </a>
-    </div>
 </div>
