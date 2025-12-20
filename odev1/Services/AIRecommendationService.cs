@@ -5,11 +5,17 @@ using odev1.Models;
 using odev1.Services.Interfaces;
 using System.Text;
 using System.Text.Json;
+using System.Net;
+using System.Collections.Concurrent;
+using System.Security.Cryptography;
 
 namespace odev1.Services
 {
     public class AIRecommendationService : IAIRecommendationService
     {
+        private static readonly SemaphoreSlim ApiConcurrency = new SemaphoreSlim(2); // limit concurrent external calls
+        private static readonly ConcurrentDictionary<string, (string Content, DateTime ExpiresAt)> PromptCache = new();
+
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
@@ -36,10 +42,9 @@ namespace odev1.Services
             string? goal,
             string? photoPath)
         {
-            // AI önerilerini oluştur
-            var exerciseRecommendations = await GetExerciseRecommendationsAsync(height, weight, bodyType, goal);
-            var dietRecommendations = await GetDietRecommendationsAsync(height, weight, bodyType, goal);
-            var generalAdvice = await GetGeneralAdviceAsync(height, weight, bodyType, goal);
+            // Tek bir API çağrısında üç bölümü birlikte al
+            var (exerciseRecommendations, dietRecommendations, generalAdvice) =
+                await GetCombinedRecommendationsAsync(height, weight, bodyType, goal);
 
             // Veritabanına kaydet
             var recommendation = new AIRecommendation
@@ -81,21 +86,21 @@ namespace odev1.Services
             decimal? height, decimal? weight, string? bodyType, string? goal)
         {
             var prompt = BuildExercisePrompt(height, weight, bodyType, goal);
-            return await CallGeminiAPIAsync(prompt);
+            return await CallAIAPIAsync(prompt);
         }
 
         private async Task<string> GetDietRecommendationsAsync(
             decimal? height, decimal? weight, string? bodyType, string? goal)
         {
             var prompt = BuildDietPrompt(height, weight, bodyType, goal);
-            return await CallGeminiAPIAsync(prompt);
+            return await CallAIAPIAsync(prompt);
         }
 
         private async Task<string> GetGeneralAdviceAsync(
             decimal? height, decimal? weight, string? bodyType, string? goal)
         {
             var prompt = BuildGeneralAdvicePrompt(height, weight, bodyType, goal);
-            return await CallGeminiAPIAsync(prompt);
+            return await CallAIAPIAsync(prompt);
         }
 
         private string BuildExercisePrompt(decimal? height, decimal? weight, string? bodyType, string? goal)
@@ -150,7 +155,7 @@ namespace odev1.Services
             var sb = new StringBuilder();
             sb.AppendLine("Sen bir fitness ve sağlık koçusun. Aşağıdaki bilgilere göre genel tavsiyeler sun:");
             sb.AppendLine();
-            
+
             if (height.HasValue && weight.HasValue)
             {
                 var bmi = (double)weight / Math.Pow((double)height / 100, 2);
@@ -173,89 +178,210 @@ namespace odev1.Services
             return sb.ToString();
         }
 
-        private async Task<string> CallGeminiAPIAsync(string prompt)
+        private string BuildCombinedPrompt(decimal? height, decimal? weight, string? bodyType, string? goal)
         {
-            var apiKey = _configuration["Gemini:ApiKey"];
-            if (string.IsNullOrEmpty(apiKey))
+            var sb = new StringBuilder();
+            sb.AppendLine("Sen fitnes ve beslenme alanında uzmansın. Türkçe yanıt ver.");
+            sb.AppendLine("Aşağıdaki bilgiler ışığında üç ayrı bölüm üret ve her bölümü işaretlerle ayır:");
+            sb.AppendLine("[EXERCISE] ... [/EXERCISE]");
+            sb.AppendLine("[DIET] ... [/DIET]");
+            sb.AppendLine("[GENERAL] ... [/GENERAL]");
+            sb.AppendLine();
+            if (height.HasValue) sb.AppendLine($"Boy: {height} cm");
+            if (weight.HasValue) sb.AppendLine($"Kilo: {weight} kg");
+            if (!string.IsNullOrEmpty(bodyType)) sb.AppendLine($"Vücut Tipi: {bodyType}");
+            if (!string.IsNullOrEmpty(goal)) sb.AppendLine($"Hedef: {goal}");
+            sb.AppendLine();
+            sb.AppendLine("EXERCISE bölümünde: Haftalık program, set/tekrar, ilerleme önerileri, dikkat noktaları.");
+            sb.AppendLine("DIET bölümünde: Kalori hedefi, makro dağılımı, örnek öğün planları, önerilen/kaçınılacaklar.");
+            sb.AppendLine("GENERAL bölümünde: Sağlıklı yaşam, motivasyon, uyku/dinlenme, genel sağlık tavsiyeleri.");
+            return sb.ToString();
+        }
+
+        private static (string Exercise, string Diet, string General) ParseCombinedResponse(string content)
+        {
+            static string Extract(string text, string tag)
             {
-                _logger.LogWarning("Gemini API key bulunamadı. Varsayılan mesaj döndürülüyor.");
-                return "Gemini API anahtarı yapılandırılmamış. Lütfen appsettings.json dosyasına Gemini:ApiKey ekleyin. Ücretsiz API key için: https://aistudio.google.com/apikey";
+                var start = text.IndexOf($"[{tag}]", StringComparison.OrdinalIgnoreCase);
+                var end = text.IndexOf($"[/{tag}]", StringComparison.OrdinalIgnoreCase);
+                if (start >= 0 && end > start)
+                {
+                    var s = start + tag.Length + 2; // [TAG]
+                    return text.Substring(s, end - s).Trim();
+                }
+                return string.Empty;
+            }
+
+            var exercise = Extract(content, "EXERCISE");
+            var diet = Extract(content, "DIET");
+            var general = Extract(content, "GENERAL");
+
+            // Boş kalanları tüm yanıtla doldur (en azından içerik sağlansın)
+            if (string.IsNullOrWhiteSpace(exercise)) exercise = content;
+            if (string.IsNullOrWhiteSpace(diet)) diet = content;
+            if (string.IsNullOrWhiteSpace(general)) general = content;
+            return (exercise, diet, general);
+        }
+
+        private async Task<(string Exercise, string Diet, string General)> GetCombinedRecommendationsAsync(
+            decimal? height, decimal? weight, string? bodyType, string? goal)
+        {
+            var prompt = BuildCombinedPrompt(height, weight, bodyType, goal);
+            var response = await CallAIAPIAsync(prompt);
+            return ParseCombinedResponse(response);
+        }
+
+        private static string ComputeCacheKey(string model, string prompt)
+        {
+            using var sha = SHA256.Create();
+            var bytes = Encoding.UTF8.GetBytes(model + "|" + prompt);
+            var hash = sha.ComputeHash(bytes);
+            return Convert.ToHexString(hash);
+        }
+
+        private async Task<string> CallAIAPIAsync(string prompt)
+        {
+            var groqKey = _configuration["Groq:ApiKey"];
+            var groqModel = _configuration["Groq:Model"];
+            var maxTokensStr = _configuration["Groq:MaxOutputTokens"];
+            int maxTokens = 1024;
+            if (!string.IsNullOrWhiteSpace(maxTokensStr) && int.TryParse(maxTokensStr, out var parsed) && parsed > 0)
+            {
+                maxTokens = parsed;
             }
 
             try
             {
-                // Gemini API için sistem prompt'u kullanıcı prompt'una ekle
+                // Sistem prompt'u kullanıcı prompt'una ekle
                 var fullPrompt = "Sen bir fitness ve beslenme uzmanısın. Türkçe yanıt ver.\n\n" + prompt;
 
-                var requestBody = new
+                if (string.IsNullOrWhiteSpace(groqKey))
                 {
-                    contents = new[]
+                    _logger.LogWarning("Groq API key bulunamadı.");
+                    return "Groq API anahtarı yapılandırılmamış. Lütfen appsettings.json dosyasına Groq:ApiKey ekleyin. Ücretsiz API key için: https://console.groq.com/keys";
+                }
+                var resolvedModel = string.IsNullOrWhiteSpace(groqModel) ? "llama-3.1-70b-versatile" : groqModel;
+                var groqBody = new
+                {
+                    model = resolvedModel,
+                    messages = new object[]
                     {
-                        new
-                        {
-                            parts = new[]
-                            {
-                                new { text = fullPrompt }
-                            }
-                        }
+                        new { role = "system", content = "Sen bir fitness ve beslenme uzmanısın. Türkçe yanıt ver." },
+                        new { role = "user", content = prompt }
                     },
-                    generationConfig = new
-                    {
-                        temperature = 0.7,
-                        topK = 40,
-                        topP = 0.95,
-                        maxOutputTokens = 2000
-                    }
+                    temperature = 0.7,
+                    max_tokens = maxTokens
                 };
-
-                var json = JsonSerializer.Serialize(requestBody);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
+                var groqJson = JsonSerializer.Serialize(groqBody);
+                var content = new StringContent(groqJson, Encoding.UTF8, "application/json");
                 _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {groqKey}");
+                var url = "https://api.groq.com/openai/v1/chat/completions";
 
-                // Gemini API endpoint - gemini-pro modeli kullanıyoruz
-                var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={apiKey}";
-                
-                var response = await _httpClient.PostAsync(url, content);
+                // Basit retry: 429/503 durumlarında exponential backoff ile tekrar dene
+                var attempt = 0;
+                var maxAttempts = 3;
+                Exception? lastException = null;
+                var cacheKey = ComputeCacheKey(resolvedModel, fullPrompt);
 
-                if (response.IsSuccessStatusCode)
+                // Cache kontrolü (10 dk)
+                if (PromptCache.TryGetValue(cacheKey, out var cached) && cached.ExpiresAt > DateTime.UtcNow)
                 {
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    var jsonDoc = JsonDocument.Parse(responseContent);
-                    
-                    // Gemini API response yapısı
-                    if (jsonDoc.RootElement.TryGetProperty("candidates", out var candidates))
+                    return cached.Content;
+                }
+
+                await ApiConcurrency.WaitAsync();
+                while (attempt < maxAttempts)
+                {
+                    attempt++;
+                    HttpResponseMessage? response = null;
+                    try
                     {
-                        if (candidates.GetArrayLength() > 0)
+                        response = await _httpClient.PostAsync(url, content);
+                        if (response.IsSuccessStatusCode)
                         {
-                            var candidate = candidates[0];
-                            if (candidate.TryGetProperty("content", out var contentElement))
+                            var responseContent = await response.Content.ReadAsStringAsync();
+                            var jsonDoc = JsonDocument.Parse(responseContent);
+                            // OpenAI/Groq tarzı yanıt: choices
+                            if (jsonDoc.RootElement.TryGetProperty("choices", out var choices))
                             {
-                                if (contentElement.TryGetProperty("parts", out var parts))
+                                if (choices.GetArrayLength() > 0)
                                 {
-                                    if (parts.GetArrayLength() > 0)
+                                    var choice = choices[0];
+                                    if (choice.TryGetProperty("message", out var msg) && msg.TryGetProperty("content", out var msgContent))
                                     {
-                                        var text = parts[0].GetProperty("text").GetString();
-                                        return text ?? "Yanıt alınamadı.";
+                                        var result = msgContent.GetString() ?? "Yanıt alınamadı.";
+                                        PromptCache[cacheKey] = (result, DateTime.UtcNow.AddMinutes(10));
+                                        return result;
+                                    }
+                                    // bazı sağlayıcılarda 'text' alanı olabilir
+                                    if (choice.TryGetProperty("text", out var textNode))
+                                    {
+                                        var result = textNode.GetString() ?? "Yanıt alınamadı.";
+                                        PromptCache[cacheKey] = (result, DateTime.UtcNow.AddMinutes(10));
+                                        return result;
                                     }
                                 }
                             }
+                            _logger.LogWarning("AI API yanıt formatı beklenmedik: {Response}", responseContent);
+                            return "Yanıt formatı beklenmedik.";
+                        }
+                        else if (response.StatusCode == HttpStatusCode.TooManyRequests || response.StatusCode == HttpStatusCode.ServiceUnavailable)
+                        {
+                            // Retry After başlığı varsa ona uy
+                            TimeSpan delay = TimeSpan.FromSeconds(Math.Pow(2, attempt)); // 2,4,8
+                            if (response.Headers.RetryAfter != null)
+                            {
+                                if (response.Headers.RetryAfter.Delta.HasValue)
+                                {
+                                    delay = response.Headers.RetryAfter.Delta.Value;
+                                }
+                                else if (response.Headers.RetryAfter.Date.HasValue)
+                                {
+                                    var until = response.Headers.RetryAfter.Date.Value - DateTimeOffset.UtcNow;
+                                    if (until > TimeSpan.Zero) delay = until;
+                                }
+                            }
+                            // küçük jitter
+                            var jitterMs = Random.Shared.Next(100, 400);
+                            delay += TimeSpan.FromMilliseconds(jitterMs);
+                            _logger.LogWarning("AI API oran limitine takıldı ({Status}). {Delay} sonra tekrar denenecek (attempt {Attempt}/{Max}).", response.StatusCode, delay, attempt, maxAttempts);
+                            await Task.Delay(delay);
+                            continue;
+                        }
+                        else
+                        {
+                            var errorContent = await response.Content.ReadAsStringAsync();
+                            _logger.LogError("AI API hatası: {StatusCode} - {Error}", response.StatusCode, errorContent);
+                            return $"API hatası: {response.StatusCode}. Lütfen daha sonra tekrar deneyin.";
                         }
                     }
-                    
-                    _logger.LogWarning("Gemini API yanıt formatı beklenmedik: {Response}", responseContent);
-                    return "Yanıt formatı beklenmedik.";
+                    catch (Exception exLoop)
+                    {
+                        lastException = exLoop;
+                        _logger.LogWarning(exLoop, "AI API çağrısı denemesi başarısız (attempt {Attempt}/{Max})", attempt, maxAttempts);
+                        // kısa bekleme ile yeniden dene
+                        var delay = TimeSpan.FromSeconds(Math.Pow(2, attempt)) + TimeSpan.FromMilliseconds(Random.Shared.Next(100, 300));
+                        await Task.Delay(delay);
+                        continue;
+                    }
+                    finally
+                    {
+                        response?.Dispose();
+                    }
                 }
-                else
+                ApiConcurrency.Release();
+                
+                // Tüm denemeler tükendi
+                if (lastException != null)
                 {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    _logger.LogError("Gemini API hatası: {StatusCode} - {Error}", response.StatusCode, errorContent);
-                    return $"API hatası: {response.StatusCode}. Lütfen daha sonra tekrar deneyin.";
+                    _logger.LogError(lastException, "AI API çağrısı tekrar denemelerine rağmen başarısız oldu");
                 }
+                return "Şu anda AI servisi yoğun. Lütfen kısa bir süre sonra yeniden deneyin.";
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Gemini API çağrısı sırasında hata oluştu");
+                _logger.LogError(ex, "AI API çağrısı sırasında hata oluştu");
                 return $"Bir hata oluştu: {ex.Message}. Lütfen daha sonra tekrar deneyin.";
             }
         }

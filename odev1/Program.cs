@@ -4,9 +4,11 @@ using odev1.Data;
 using odev1.Models;
 using odev1.Services;
 using TrainerServiceImpl = odev1.Services.TrainerService;
+using DotNetEnv;
 
 // saat dilimi enable
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+Env.Load(); // .env dosyasını yükler
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
