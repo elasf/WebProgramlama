@@ -195,7 +195,7 @@ namespace odev1.Migrations
 
                     b.HasIndex("userId");
 
-                    b.ToTable("Appointments");
+                    b.ToTable("Appointments", (string)null);
                 });
 
             modelBuilder.Entity("odev1.Models.Availability", b =>
@@ -215,14 +215,17 @@ namespace odev1.Migrations
                     b.Property<TimeSpan>("startTime")
                         .HasColumnType("interval");
 
-                    b.Property<int>("trainerId")
+                    b.Property<int>("tarinerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("trainerid")
                         .HasColumnType("integer");
 
                     b.HasKey("id");
 
-                    b.HasIndex("trainerId");
+                    b.HasIndex("trainerid");
 
-                    b.ToTable("Availabilities");
+                    b.ToTable("Availabilities", (string)null);
                 });
 
             modelBuilder.Entity("odev1.Models.Expertise", b =>
@@ -239,7 +242,7 @@ namespace odev1.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Expertises");
+                    b.ToTable("Expertises", (string)null);
                 });
 
             modelBuilder.Entity("odev1.Models.Member", b =>
@@ -265,7 +268,7 @@ namespace odev1.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Members");
+                    b.ToTable("Members", (string)null);
                 });
 
             modelBuilder.Entity("odev1.Models.Service", b =>
@@ -276,7 +279,7 @@ namespace odev1.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
 
-                    b.Property<int>("duration")
+                    b.Property<int>("duraiton")
                         .HasColumnType("integer");
 
                     b.Property<string>("name")
@@ -288,7 +291,7 @@ namespace odev1.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Services");
+                    b.ToTable("Services", (string)null);
                 });
 
             modelBuilder.Entity("odev1.Models.Trainer", b =>
@@ -311,7 +314,7 @@ namespace odev1.Migrations
 
                     b.HasIndex("userId");
 
-                    b.ToTable("Trainers");
+                    b.ToTable("Trainers", (string)null);
                 });
 
             modelBuilder.Entity("odev1.Models.TrainerExpertise", b =>
@@ -326,7 +329,7 @@ namespace odev1.Migrations
 
                     b.HasIndex("expertiseId");
 
-                    b.ToTable("TrainerExpertises");
+                    b.ToTable("TrainerExpertises", (string)null);
                 });
 
             modelBuilder.Entity("odev1.Models.TrainerService", b =>
@@ -341,7 +344,7 @@ namespace odev1.Migrations
 
                     b.HasIndex("serviceId");
 
-                    b.ToTable("TrainerServices");
+                    b.ToTable("TrainerServices", (string)null);
                 });
 
             modelBuilder.Entity("odev1.Models.UserDetails", b =>
@@ -500,7 +503,7 @@ namespace odev1.Migrations
                 {
                     b.HasOne("odev1.Models.Trainer", "trainer")
                         .WithMany("availabilities")
-                        .HasForeignKey("trainerId")
+                        .HasForeignKey("trainerid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

@@ -24,6 +24,7 @@ namespace odev1.Data
         public DbSet<TrainerService> TrainerServices { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Member> Members { get; set; }
+        public DbSet<ProgressEntry> ProgressEntries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

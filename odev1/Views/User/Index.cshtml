@@ -34,6 +34,36 @@
     </div>
 </div>
 
+<div class="row g-3 mt-1">
+    <div class="col-md-4">
+        <div class="card border-secondary">
+            <div class="card-body">
+                <h5 class="card-title">Profilim</h5>
+                <p class="card-text">Ad, soyad ve telefon bilgilerinizi güncelleyin.</p>
+                <a asp-controller="User" asp-action="Profile" class="btn btn-outline-secondary">Profili Düzenle</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-warning">
+            <div class="card-body">
+                <h5 class="card-title">İlerlemem</h5>
+                <p class="card-text">Kilo/ölçü kayıtlarınızı girin ve grafikte görün.</p>
+                <a asp-controller="User" asp-action="Progress" class="btn btn-outline-warning">İlerlememi Gör</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-dark">
+            <div class="card-body">
+                <h5 class="card-title">Yardım & SSS</h5>
+                <p class="card-text">Sık sorulan sorular ve iletişim bilgileri.</p>
+                <a asp-controller="User" asp-action="Help" class="btn btn-outline-dark">Yardım</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <hr />
 <div class="d-flex gap-2">
     <a asp-controller="User" asp-action="Book" class="btn btn-primary">Randevu Al</a>

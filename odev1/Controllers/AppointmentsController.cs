@@ -30,7 +30,7 @@ namespace odev1.Controllers
 
         // Randevu formu (GET)
         [HttpGet]
-        public async Task<IActionResult> Create(int? serviceId = null)
+        public async Task<IActionResult> Create(int? serviceId = null, int? trainerId = null, DateTime? date = null, TimeSpan? startTime = null)
         {
             var vm = new AppointmentCreateViewModel
             {
@@ -52,6 +52,26 @@ namespace odev1.Controllers
                 var service = await _context.Services.FindAsync(serviceId.Value);
                 vm.Price = service?.price;
             }
+
+            if (trainerId.HasValue)
+            {
+                vm.TrainerId = trainerId;
+                if (!vm.ServiceId.HasValue)
+                {
+                    // trainer'ın ilk verdiği hizmet varsayılan (edge case)
+                    var firstServiceId = await _context.TrainerServices.Where(ts => ts.trainerId == trainerId.Value).Select(ts => ts.serviceId).FirstOrDefaultAsync();
+                    if (firstServiceId > 0)
+                    {
+                        vm.ServiceId = firstServiceId;
+                        vm.Trainers = await TrainersSelectListForService(firstServiceId);
+                        var service = await _context.Services.FindAsync(firstServiceId);
+                        vm.Price = service?.price;
+                    }
+                }
+            }
+
+            if (date.HasValue) vm.AppointmentDate = date.Value.Date;
+            if (startTime.HasValue) vm.StartTime = startTime.Value;
 
             return View(vm);
         }
@@ -186,13 +206,19 @@ namespace odev1.Controllers
                 .FirstOrDefaultAsync(a => a.id == id && a.userId == user.Id);
             if (ap == null) return NotFound();
 
+            // hizmet süresini güvenli taraftan al (navigasyon boş olursa 0 görünmesin)
+            var serviceDuration = await _context.Services
+                .Where(s => s.id == ap.serviceId)
+                .Select(s => s.duration)
+                .FirstOrDefaultAsync();
+
             var vm = new odev1.ViewModels.AppointmentRescheduleViewModel
             {
                 AppointmentId = ap.id,
                 AppointmentDate = ap.AppointmentDate,
                 StartTime = ap.StartTime,
                 ServiceName = ap.service?.name ?? "",
-                ServiceDuration = ap.service?.duration ?? 0,
+                ServiceDuration = serviceDuration > 0 ? serviceDuration : ap.service?.duration ?? 0,
                 TrainerName = ap.trainer?.fullName ?? ""
             };
 
@@ -204,47 +230,77 @@ namespace odev1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reschedule(odev1.ViewModels.AppointmentRescheduleViewModel vm)
         {
-            if (!ModelState.IsValid) return View(vm);
-
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Challenge();
 
             var ap = await _context.Appointments
                 .Include(a => a.service)
+                .Include(a => a.trainer)
                 .FirstOrDefaultAsync(a => a.id == vm.AppointmentId && a.userId == user.Id);
             if (ap == null) return NotFound();
 
-            var service = ap.service;
-            if (service == null) return BadRequest();
+            // ModelState hatalıysa görsel bilgileri doldurup geri dön
+            if (!ModelState.IsValid)
+            {
+                vm.ServiceName = ap.service?.name ?? string.Empty;
+                vm.ServiceDuration = ap.service?.duration ?? 0;
+                vm.TrainerName = ap.trainer?.fullName ?? string.Empty;
+                return View(vm);
+            }
+
+            // Hizmet süresi güvenli şekilde yüklenir
+            var serviceDuration = await _context.Services
+                .Where(s => s.id == ap.serviceId)
+                .Select(s => s.duration)
+                .FirstOrDefaultAsync();
+            if (serviceDuration <= 0) return BadRequest();
 
             var start = vm.StartTime!.Value;
-            var end = start.Add(TimeSpan.FromMinutes(service.duration));
+            var end = start.Add(TimeSpan.FromMinutes(serviceDuration));
 
-            // uygunluk kontrolü
-            var candidate = new Appointment
-            {
-                id = ap.id,
-                userId = ap.userId,
-                trainerId = ap.trainerId,
-                serviceId = ap.serviceId,
-                AppointmentDate = vm.AppointmentDate!.Value.Date,
-                StartTime = start,
-                EndTime = end
-            };
+            // uygunluk ve çakışma kontrolü (mevcut randevuyu hariç tut)
+            var newDate = vm.AppointmentDate!.Value.Date;
+            var trainerId = ap.trainerId;
 
-            if (!_appointmentService.canCreateAppointment(candidate))
+            var withinAvailability = await _context.Availabilities.AnyAsync(a =>
+                a.trainerId == trainerId &&
+                a.date.Date == newDate &&
+                start >= a.startTime &&
+                end <= a.endTime
+            );
+
+            if (!withinAvailability)
             {
-                ModelState.AddModelError(string.Empty, "Seçilen tarih ve saat dilimi uygun değil.");
-                // Görsel bilgiler
-                vm.ServiceName = service.name;
-                vm.ServiceDuration = service.duration;
+                ModelState.AddModelError(string.Empty, "Seçilen saat, eğitmenin çalışma saatleri dışında.");
+                vm.ServiceName = ap.service?.name ?? string.Empty;
+                vm.ServiceDuration = serviceDuration;
+                vm.TrainerName = ap.trainer?.fullName ?? string.Empty;
+                return View(vm);
+            }
+
+            var hasConflict = await _context.Appointments.AnyAsync(other =>
+                other.id != ap.id &&
+                other.trainerId == trainerId &&
+                other.AppointmentDate.Date == newDate &&
+                other.Status != odev1.Models.AppointmentStatus.Cancelled &&
+                start < other.EndTime &&
+                end > other.StartTime
+            );
+
+            if (hasConflict)
+            {
+                ModelState.AddModelError(string.Empty, "Bu saat aralığı dolu. Lütfen başka bir saat seçin.");
+                vm.ServiceName = ap.service?.name ?? string.Empty;
+                vm.ServiceDuration = serviceDuration;
+                vm.TrainerName = ap.trainer?.fullName ?? string.Empty;
                 return View(vm);
             }
 
             // güncelle
-            ap.AppointmentDate = candidate.AppointmentDate;
-            ap.StartTime = candidate.StartTime;
-            ap.EndTime = candidate.EndTime;
+            ap.AppointmentDate = newDate;
+            ap.StartTime = start;
+            ap.EndTime = end;
+            _context.Appointments.Update(ap);
             await _context.SaveChangesAsync();
 
             TempData["success"] = "Randevu güncellendi.";

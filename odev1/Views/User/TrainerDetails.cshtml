@@ -1,0 +1,68 @@
+@{
+    var trainer = (odev1.Models.Trainer)ViewBag.Trainer;
+    var services = (IEnumerable<odev1.Models.Service>)ViewBag.Services;
+    int? selectedServiceId = (int?)ViewBag.SelectedServiceId;
+    var dateStr = (string)ViewBag.Date;
+    var slots = ViewBag.Slots as IEnumerable<(TimeSpan, TimeSpan)> ?? Enumerable.Empty<(TimeSpan, TimeSpan)>();
+    ViewData["Title"] = "Eğitmen Detayı";
+}
+
+<h2>@trainer.fullName</h2>
+<h5>Verdiği Hizmetler</h5>
+<ul class="list-inline mb-3">
+@foreach(var s in services)
+{
+    <li class="list-inline-item">
+        <a class="btn btn-sm @(selectedServiceId == s.id ? "btn-primary" : "btn-outline-primary")"
+           asp-controller="User" asp-action="TrainerDetails"
+           asp-route-id="@trainer.id" asp-route-serviceId="@s.id" asp-route-date="@dateStr">
+            @s.name (@s.duration dk)
+        </a>
+    </li>
+}
+</ul>
+
+<form method="get" class="row g-2 mb-3">
+    <input type="hidden" name="id" value="@trainer.id" />
+    <input type="hidden" name="serviceId" value="@selectedServiceId" />
+    <div class="col-auto">
+        <label class="col-form-label">Tarih:</label>
+    </div>
+    <div class="col-auto">
+        <input type="date" class="form-control" name="date" value="@dateStr" />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-primary" type="submit">Slotları Göster</button>
+    </div>
+</form>
+
+@if (selectedServiceId.HasValue && !string.IsNullOrEmpty(dateStr))
+{
+    <h5>Uygun Slotlar (@dateStr)</h5>
+    @if (slots.Any())
+    {
+        <ul class="list-group">
+        @foreach(var slot in slots)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>@slot.Item1.ToString(@"hh\:mm") - @slot.Item2.ToString(@"hh\:mm")</span>
+                <a class="btn btn-sm btn-success"
+                   asp-controller="Appointments" asp-action="Create"
+                   asp-route-serviceId="@selectedServiceId"
+                   asp-route-trainerId="@trainer.id"
+                   asp-route-date="@dateStr"
+                   asp-route-startTime="@slot.Item1.ToString()" >
+                    Randevu Al
+                </a>
+            </li>
+        }
+        </ul>
+    }
+    else
+    {
+        <div class="alert alert-warning">Bu tarih için uygun slot bulunamadı.</div>
+    }
+}
+
+<a class="btn btn-outline-secondary mt-3" asp-controller="User" asp-action="Trainers">Geri</a>
+

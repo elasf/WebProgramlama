@@ -5,25 +5,33 @@
 
 <h2>Hizmetler</h2>
 <hr />
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <th>Ad</th>
-            <th>Süre (dk)</th>
-            <th>Ücret</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach(var s in Model)
-    {
-        <tr>
-            <td>@s.name</td>
-            <td>@s.duration</td>
-            <td>@s.price.ToString("C")</td>
-        </tr>
-    }
-    </tbody>
-</table>
 
-<a asp-controller="User" asp-action="Book" class="btn btn-primary">Randevu Al</a>
+<div class="row g-3">
+@foreach (var s in Model)
+{
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title">@s.name</h5>
+                <p class="card-text mb-1">Süre: @s.duration dk</p>
+                <p class="card-text">Ücret: @s.price.ToString("C")</p>
+                <div class="mt-auto d-flex gap-2">
+                    <a class="btn btn-sm btn-outline-primary"
+                       asp-controller="User" asp-action="ServiceDetails" asp-route-id="@s.id">
+                        Detay
+                    </a>
+                    <a class="btn btn-sm btn-primary"
+                       asp-controller="Appointments" asp-action="Create" asp-route-serviceId="@s.id">
+                        Randevu Al
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+</div>
+
+<div class="mt-3">
+    <a asp-controller="User" asp-action="Book" class="btn btn-primary">Randevu Al</a>
+</div>
 

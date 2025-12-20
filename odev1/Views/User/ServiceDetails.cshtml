@@ -1,0 +1,47 @@
+@model IEnumerable<odev1.Models.Trainer>
+@{
+    var svc = (odev1.Models.Service)ViewBag.Service;
+    var dateStr = (string)ViewBag.Date;
+    ViewData["Title"] = "Hizmet Detayı";
+}
+
+<h2>@svc.name</h2>
+<p>Süre: @svc.duration dk — Ücret: @svc.price.ToString("C")</p>
+
+<form method="get" class="row g-2 mb-3">
+    <input type="hidden" name="id" value="@svc.id" />
+    <div class="col-auto">
+        <label class="col-form-label">Tarih:</label>
+    </div>
+    <div class="col-auto">
+        <input type="date" class="form-control" name="date" value="@dateStr" />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-primary" type="submit">Filtrele</button>
+    </div>
+</form>
+
+<h5>Eğitmenler</h5>
+<ul class="list-group mb-3">
+@foreach(var t in Model)
+{
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>@t.fullName</span>
+        <span class="d-flex gap-2">
+            <a class="btn btn-sm btn-outline-secondary"
+               asp-controller="User" asp-action="TrainerDetails"
+               asp-route-id="@t.id" asp-route-serviceId="@svc.id" asp-route-date="@dateStr">
+               Eğitmen Detayı
+            </a>
+            <a class="btn btn-sm btn-primary"
+               asp-controller="Appointments" asp-action="Create"
+               asp-route-serviceId="@svc.id">
+               Randevu Al
+            </a>
+        </span>
+    </li>
+}
+</ul>
+
+<a class="btn btn-outline-secondary" asp-controller="User" asp-action="Services">Geri</a>
+

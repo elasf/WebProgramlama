@@ -1,0 +1,85 @@
+@model IEnumerable<odev1.Models.ProgressEntry>
+@{
+    ViewData["Title"] = "İlerlemem";
+    var points = Model.OrderBy(x => x.date).ToList();
+}
+
+<h2>İlerlemem</h2>
+@if (TempData["success"] != null)
+{
+    <div class="alert alert-success">@TempData["success"]</div>
+}
+
+<div class="mb-3">
+    <a asp-action="CreateProgress" class="btn btn-primary">Yeni Kayıt</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">Panele Dön</a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <canvas id="weightChart" height="110"></canvas>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Tarih</th>
+            <th>Kilo (kg)</th>
+            <th>Yağ (%)</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var r in points)
+    {
+        <tr>
+            <td>@r.date.ToString("dd.MM.yyyy")</td>
+            <td>@r.weightKg</td>
+            <td>@(r.bodyFatPercent?.ToString() ?? "-")</td>
+        </tr>
+    }
+    </tbody>
+    @if (!points.Any())
+    {
+        <tfoot>
+            <tr>
+                <td colspan="3" class="text-muted">Henüz kayıt yok.</td>
+            </tr>
+        </tfoot>
+    }
+</table>
+
+@section Scripts{
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(points.Select(p => p.date.ToString("dd.MM.yyyy"))));
+        const weights = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(points.Select(p => p.weightKg)));
+
+        const ctx = document.getElementById('weightChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Kilo (kg)',
+                    data: weights,
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13,110,253,.1)',
+                    tension: .25,
+                    fill: true,
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    y: { beginAtZero: false }
+                }
+            }
+        });
+    </script>
+}
+
