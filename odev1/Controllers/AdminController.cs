@@ -32,28 +32,7 @@ namespace odev1.Controllers
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> createTrainer(TrainerRegisterViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
 
-            var result = await _adminService.createTrainerAsync(model);
-
-            if (result.Succeeded)
-            {
-                TempData["success"] = "Antrenör sisteme eklendi.";
-                return RedirectToAction("createTrainer");
-            }
-
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError("", error.Description);
-            }
-
-            return View(model);
-        }
+        
     }
 }

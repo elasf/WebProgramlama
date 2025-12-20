@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace odev1.Models
 {
@@ -10,6 +11,11 @@ namespace odev1.Models
         public string fullName { get; set; }
 
         public string userId { get; set; }
+
+        
+        
+        [ForeignKey("userId")]
+        public UserDetails User { get; set; }
 
         public ICollection<TrainerExpertise> trainerExpertises { get; set; }
         public ICollection<TrainerService> trainerServices { get; set; }

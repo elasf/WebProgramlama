@@ -21,7 +21,8 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<AdminService>();
 builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<AppointmentService>();   
+builder.Services.AddScoped<AppointmentService>();
+builder.Services.AddScoped<odev1.Services.TrainerManageService>();
 
 var app = builder.Build();
 

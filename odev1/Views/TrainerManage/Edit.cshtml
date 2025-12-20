@@ -1,0 +1,107 @@
+﻿@model odev1.Models.ViewModels.TrainerManageViewModel
+
+@{
+    ViewData["Title"] = "Antrenör Düzenle";
+}
+
+<div class="container mt-4">
+    <h3>Antrenör Bilgilerini Düzenle</h3>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-7">
+
+            <form asp-action="Edit" method="post">
+
+                <input type="hidden" asp-for="TrainerId" />
+
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Ad</label>
+                        <input asp-for="FirstName" class="form-control" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Soyad</label>
+                        <input asp-for="LastName" class="form-control" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">E-Posta</label>
+                        <input asp-for="email" class="form-control" />
+                        <span asp-validation-for="email" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Telefon Numarası</label>
+                        <input asp-for="PhoneNumber" class="form-control" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Şifre <small class="text-muted">(Değiştirmek istemiyorsanız boş bırakın)</small></label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="******" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Vereceği Hizmetler</label>
+                    <div class="border rounded p-3 bg-light" style="max-height: 200px; overflow-y: auto;">
+                        <div class="row">
+                            @if (ViewBag.Services != null)
+                            {
+                                foreach (var item in (Microsoft.AspNetCore.Mvc.Rendering.MultiSelectList)ViewBag.Services)
+                                {
+                                    <div class="col-sm-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                   name="SelectedServiceIds"
+                                                   value="@item.Value"
+                                                   id="srv_@item.Value"
+                                                   @(item.Selected ? "checked" : "")> <label class="form-check-label user-select-none" for="srv_@item.Value">
+                                                @item.Text
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Uzmanlık Alanları</label>
+                    <div class="border rounded p-3 bg-light" style="max-height: 200px; overflow-y: auto;">
+                        <div class="row">
+                            @if (ViewBag.Expertises != null)
+                            {
+                                foreach (var item in (Microsoft.AspNetCore.Mvc.Rendering.MultiSelectList)ViewBag.Expertises)
+                                {
+                                    <div class="col-sm-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                   name="SelectedExpertiseIds"
+                                                   value="@item.Value"
+                                                   id="exp_@item.Value"
+                                                   @(item.Selected ? "checked" : "")> <label class="form-check-label user-select-none" for="exp_@item.Value">
+                                                @item.Text
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Güncelle</button>
+                <a asp-action="Index" class="btn btn-secondary">İptal</a>
+
+            </form>
+        </div>
+    </div>
+</div>

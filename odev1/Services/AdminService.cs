@@ -17,36 +17,7 @@ namespace odev1.Services
             _userManager = userManager;
         }
 
-        public async Task<IdentityResult> createTrainerAsync(TrainerRegisterViewModel model)
-        {
-
-            if (UserExists(model.email)){
-
-                return IdentityResult.Failed(new IdentityError { Description = "Bu email adresi zaten kayıtlı." });
-            }
-
-            var user = new UserDetails
-            {
-                UserName = model.email,
-                Email = model.email,
-                userAd = model.firstName,
-                userSoyad = model.lastName,
-                PhoneNumber = model.phoneNumber,
-                EmailConfirmed = true //admin ekledği için direkt onay
-            };
-
-            var result = await _userManager.CreateAsync(user, model.password);
-
-            if (!result.Succeeded){
-
-                return result;
-            }
-
-            //rolü ata trainer tablosuna kaydet diyoruz
-            await assignTrainerRoleTable(user, model);
-
-            return IdentityResult.Success;
-        }
+        
 
         public List<Member> getAllMembers()
         {
@@ -62,21 +33,7 @@ namespace odev1.Services
             return _context.Users.Any(u => u.Email == email);
         }
 
-        private async Task assignTrainerRoleTable(UserDetails user, TrainerRegisterViewModel model)
-        {
-
-            await _userManager.AddToRoleAsync(user, "trainer");
-
-            //dbye ekledik
-            var trainer = new Trainer
-            {
-                userId = user.Id, //bağlantıyı kurduk
-                fullName = $"{model.firstName} {model.lastName}",
-            };
-
-            await _context.Trainers.AddAsync(trainer);
-            await _context.SaveChangesAsync();
-        }
+        
 
 
         // ---servis yönetim kısmı ---
@@ -96,6 +53,13 @@ namespace odev1.Services
         public async Task CreateServiceAsync(Service service)
         {
             _context.Services.Add(service);
+            var expertise = new Expertise
+            {
+                expertise = service.name //hizmet eklerken uzmanlığa da ekliyoruz pratik olsun diye
+            };
+
+            
+            _context.Expertises.Add(expertise);
             await _context.SaveChangesAsync();
         }
 
