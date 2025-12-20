@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using odev1.Data;
 using odev1.Models;
 using odev1.Services;
+using TrainerServiceImpl = odev1.Services.TrainerService;
 
 // saat dilimi enable
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -15,14 +16,25 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<UserDetails>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddRoles<IdentityRole>()     //ROL SERVÝSÝ AKTÝF
+    .AddRoles<IdentityRole>()     //ROL SERVï¿½Sï¿½ AKTï¿½F
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();   
+builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();   
+builder.Services.AddScoped<ITrainerService, TrainerServiceImpl>();   
+builder.Services.AddScoped<ISchedulingQueryService, SchedulingQueryService>();  
 builder.Services.AddScoped<AdminService>();
+<<<<<<< HEAD
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AppointmentService>();
 builder.Services.AddScoped<odev1.Services.TrainerManageService>();
+=======
+builder.Services.AddScoped<AppointmentService>(); 
+builder.Services.AddScoped<TrainerServiceImpl>(); 
+>>>>>>> 9c45c3f63b51074bd64e86b63daf0021e20f18d0
 
 var app = builder.Build();
 
@@ -61,7 +73,7 @@ using (var scope = app.Services.CreateScope())
 
     foreach (var role in roles)
     {
-        //rol yoksa oluþtur
+        //rol yoksa oluï¿½tur
         try
         {
             if (!await roleManager.RoleExistsAsync(role))
@@ -71,7 +83,7 @@ using (var scope = app.Services.CreateScope())
         }
         catch (Exception ex)
         {
-            // logla ama uygulamayý düþürme
+            // logla ama uygulamayï¿½ dï¿½ï¿½ï¿½rme
         }
     }
 }

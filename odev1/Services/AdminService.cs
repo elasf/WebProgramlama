@@ -6,7 +6,7 @@ using odev1.Models.ViewModels;
 
 namespace odev1.Services
 {
-    public class AdminService
+    public class AdminService : IAdminService
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<UserDetails> _userManager;

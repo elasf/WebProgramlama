@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using odev1.Data;
@@ -11,9 +12,11 @@ using odev1.Data;
 namespace odev1.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251219222537_AddMembersAndFixes")]
+    partial class AddMembersAndFixes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -520,21 +523,13 @@ namespace odev1.Migrations
 
             modelBuilder.Entity("odev1.Models.Trainer", b =>
                 {
-<<<<<<< HEAD
-                    b.HasOne("odev1.Models.UserDetails", "User")
-=======
                     b.HasOne("odev1.Models.UserDetails", "user")
->>>>>>> 9c45c3f63b51074bd64e86b63daf0021e20f18d0
                         .WithMany()
                         .HasForeignKey("userId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-<<<<<<< HEAD
-                    b.Navigation("User");
-=======
                     b.Navigation("user");
->>>>>>> 9c45c3f63b51074bd64e86b63daf0021e20f18d0
                 });
 
             modelBuilder.Entity("odev1.Models.TrainerExpertise", b =>

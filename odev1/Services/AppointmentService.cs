@@ -3,7 +3,7 @@ using odev1.Models;
 
 namespace odev1.Services
 {
-    public class AppointmentService
+    public class AppointmentService : IAppointmentService
     {
         private readonly ApplicationDbContext _context;
         public AppointmentService(ApplicationDbContext context) 
@@ -25,7 +25,7 @@ namespace odev1.Services
 
         public Appointment create(Appointment appointment)
         {
-            if (canCreateAppointment(appointment))
+            if (!canCreateAppointment(appointment))
                 throw new Exception("Trainer is not available.");
 
             appointment.Status = AppointmentStatus.Pending;
@@ -102,7 +102,7 @@ namespace odev1.Services
             //BUnlardan biri bile yanlış çıkarsa trainer müsait değil abla.
             //Şimdilik baya basit ileride canımız sıkılırsa geliştiririz.
             return _context.Availabilities.Any(a =>
-            a.tarinerId == trainerId &&
+            a.trainerId == trainerId &&
             a.date.Date == date.Date &&
             startTime >= a.startTime &&
             endTime <= a.endTime);

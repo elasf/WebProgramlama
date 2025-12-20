@@ -7,9 +7,17 @@ namespace odev1.Models
     {
 
         public int id { get; set; }
-        public string name { get; set; }
-        public int duraiton { get; set; } //ingilizce yazýp hava atýcam diye yanlýþ yazmýþsýn ibret olsun diye býrakýyorum
 
+        [Required]
+        [StringLength(60)]
+        public string name { get; set; }
+
+        // dakika cinsinden
+        [Range(1, 480)]
+        public int duration { get; set; } // fixed typo
+
+        [DataType(DataType.Currency)]
+        [Range(0.0, double.MaxValue)]
         public decimal price { get; set; }
 
         public ICollection<TrainerService> trainerService { get; set; }

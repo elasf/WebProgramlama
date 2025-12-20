@@ -1,0 +1,81 @@
+@model odev1.ViewModels.AppointmentCreateViewModel
+@{
+    ViewData["Title"] = "Randevu Al";
+}
+
+<h2>Randevu Al</h2>
+<hr />
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="ServiceId" class="form-label"></label>
+        <select asp-for="ServiceId" class="form-select" id="serviceSelect">
+            <option value="">— Hizmet Seçin —</option>
+            @foreach (var s in Model.Services)
+            {
+                <option value="@s.Value" selected="@(Model.ServiceId?.ToString()==s.Value ? "selected" : null)">@s.Text</option>
+            }
+        </select>
+        <span asp-validation-for="ServiceId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="TrainerId" class="form-label"></label>
+        <select asp-for="TrainerId" class="form-select" id="trainerSelect">
+            <option value="">— Eğitmen Seçin —</option>
+            @foreach (var t in Model.Trainers)
+            {
+                <option value="@t.Value">@t.Text</option>
+            }
+        </select>
+        <span asp-validation-for="TrainerId" class="text-danger"></span>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="AppointmentDate" class="form-label"></label>
+            <input asp-for="AppointmentDate" class="form-control" type="date" />
+            <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="StartTime" class="form-label"></label>
+            <input asp-for="StartTime" class="form-control" type="time" />
+            <span asp-validation-for="StartTime" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Ücret</label>
+            <input class="form-control" value="@(Model.Price?.ToString("C"))" readonly />
+        </div>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Randevu Oluştur</button>
+    <a asp-action="My" class="btn btn-outline-secondary">Randevularım</a>
+
+    <input name="__RequestVerificationToken" type="hidden" value="@Antiforgery.GetTokens(HttpContext).RequestToken" />
+</form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const serviceSelect = document.getElementById('serviceSelect');
+        const trainerSelect = document.getElementById('trainerSelect');
+        serviceSelect.addEventListener('change', async (e) => {
+            const serviceId = e.target.value;
+            trainerSelect.innerHTML = '<option value=\"\">— Yükleniyor —</option>';
+            if (!serviceId) {
+                trainerSelect.innerHTML = '<option value=\"\">— Eğitmen Seçin —</option>';
+                return;
+            }
+            const res = await fetch(`/Appointments/TrainersForService?serviceId=${serviceId}`);
+            const data = await res.json();
+            trainerSelect.innerHTML = '<option value=\"\">— Eğitmen Seçin —</option>';
+            data.forEach(x => {
+                const opt = document.createElement('option');
+                opt.value = x.value; opt.textContent = x.text;
+                trainerSelect.appendChild(opt);
+            });
+        });
+    </script>
+}
+

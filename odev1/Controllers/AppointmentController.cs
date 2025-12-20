@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using odev1.Services;
 using odev1.Models;
+using odev1.Data;
 
 namespace odev1.Controllers
 {
@@ -10,11 +11,12 @@ namespace odev1.Controllers
     public class AppointmentController : Controller
     {
         private readonly AppointmentService _appointmentService;
+        private readonly ApplicationDbContext _context;
 
-
-        public AppointmentController(AppointmentService appointmentService)
+        public AppointmentController(AppointmentService appointmentService, ApplicationDbContext context)
         {
             _appointmentService = appointmentService;
+            _context = context;
         }
 
         [HttpPost]
@@ -77,15 +79,9 @@ namespace odev1.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var appointment = _appointmentService
-                .GetType()
-                .GetMethod("GetById")?
-                .Invoke(_appointmentService, new object[] { id });
-
-            if (appointment == null)
-                return NotFound();
-
-            return Ok(appointment);
+            var ap = _context.Appointments.FirstOrDefault(a => a.id == id);
+            if (ap == null) return NotFound();
+            return Ok(ap);
         }
 
 
