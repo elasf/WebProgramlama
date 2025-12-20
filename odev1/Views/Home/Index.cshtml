@@ -1,8 +1,119 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "LionGym - Hoş Geldiniz";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    /* Sadece gerekli olan minik dokunuşlar */
+    body {
+        background-color: #f8f9fa; /* Çok açık gri arka plan */
+        color: #333;
+    }
+
+    .hero-img {
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1); /* Hafif gölge */
+        max-height: 500px;
+        object-fit: cover;
+        width: 100%;
+    }
+
+    .service-card {
+        transition: transform 0.2s;
+        border: none;
+        background: white;
+        border-radius: 15px;
+    }
+
+        .service-card:hover {
+            transform: translateY(-5px); /* Üzerine gelince hafif yukarı kalksın */
+        }
+
+    .btn-orange {
+        background-color: #ff6b00; /* Enerjik turuncu */
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+
+        .btn-orange:hover {
+            background-color: #e65100;
+            color: white;
+        }
+</style>
+
+<div class="container py-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <h1 class="display-4 fw-bold mb-3">LionGym'e Hoş Geldin.</h1>
+            <p class="lead text-muted mb-4">
+                Karmaşadan uzak, sadece spora odaklan. Modern ekipmanlar ve temiz bir ortamda hedeflerine ulaşman için buradayız.
+            </p>
+        </div>
+        <div class="col-lg-6">
+            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop"
+                 class="hero-img" alt="Gym Interior">
+        </div>
+    </div>
+</div>
+
+<div class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Neler Sunuyoruz?</h2>
+            <p class="text-muted">Sizin için hazırladığımız çalışma alanları.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card service-card h-100 p-4 text-center shadow-sm">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-dumbbell fa-3x"></i>
+                    </div>
+                    <h4>Serbest Ağırlık</h4>
+                    <p class="text-muted small">Geniş ve ferah serbest ağırlık alanı ile bekleme yapmadan çalışın.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card service-card h-100 p-4 text-center shadow-sm">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-heartbeat fa-3x"></i>
+                    </div>
+                    <h4>Kardiyo Alanı</h4>
+                    <p class="text-muted small">En yeni koşu bantları ve bisikletlerle kondisyonunuzu arttırın.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card service-card h-100 p-4 text-center shadow-sm">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-users fa-3x"></i>
+                    </div>
+                    <h4>Grup Dersleri</h4>
+                    <p class="text-muted small">Pilates, Yoga ve Zumba dersleri ile eğlenerek form tutun.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row align-items-center bg-white p-4 rounded-3 shadow-sm border">
+        <div class="col-md-8">
+            <h3 class="fw-bold">Neden LionGym?</h3>
+            <p class="text-muted mb-0">
+                Çünkü biz sadece spora odaklanıyoruz. Temiz havlular, hijyenik soyunma odaları ve güler yüzlü ekip. Karmaşık üyelik sistemleri yok, sadece gel ve antrenmanını yap.
+            </p>
+        </div>
+        <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+            <i class="fas fa-check-circle fa-4x text-success opacity-50"></i>
+        </div>
+    </div>
+</div>
+
+<div class="text-center py-5">
+    <h3 class="fw-bold mb-3">Hazır mısın?</h3>
+    <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-dark px-5 py-3 rounded-pill">
+        Hemen Başla
+    </a>
 </div>

@@ -9,9 +9,9 @@
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="mb-3">
-        <label asp-for="ServiceId" class="form-label"></label>
+        <label asp-for="ServiceId" class="form-label">Hizmet seçiniz</label>
         <select asp-for="ServiceId" class="form-select" id="serviceSelect">
-            <option value="">— Hizmet Seçin —</option>
+            <option value="">Hizmetler</option>
             @foreach (var s in Model.Services)
             {
                 <option value="@s.Value" selected="@(Model.ServiceId?.ToString()==s.Value ? "selected" : null)">@s.Text</option>
@@ -21,9 +21,9 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="TrainerId" class="form-label"></label>
+        <label asp-for="TrainerId" class="form-label">Eğitmen seçiniz</label>
         <select asp-for="TrainerId" class="form-select" id="trainerSelect">
-            <option value="">— Eğitmen Seçin —</option>
+            <option value="">Eğitmenler</option>
             @foreach (var t in Model.Trainers)
             {
                 <option value="@t.Value">@t.Text</option>
@@ -34,12 +34,12 @@
 
     <div class="row">
         <div class="col-md-4 mb-3">
-            <label asp-for="AppointmentDate" class="form-label"></label>
+            <label asp-for="AppointmentDate" class="form-label">Randevu tarihi</label>
             <input asp-for="AppointmentDate" class="form-control" type="date" />
             <span asp-validation-for="AppointmentDate" class="text-danger"></span>
         </div>
         <div class="col-md-4 mb-3">
-            <label asp-for="StartTime" class="form-label"></label>
+            <label asp-for="StartTime" class="form-label">Başlangıç saati</label>
             <input asp-for="StartTime" class="form-control" type="time" />
             <span asp-validation-for="StartTime" class="text-danger"></span>
         </div>

@@ -33,10 +33,10 @@ namespace odev1.Migrations
                 table: "Availabilities",
                 newName: "IX_Availabilities_trainerId");
 
-            migrationBuilder.CreateIndex(
+            /*migrationBuilder.CreateIndex(
                 name: "IX_Trainers_userId",
                 table: "Trainers",
-                column: "userId");
+                column: "userId");*/
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Availabilities_Trainers_trainerId",
@@ -46,13 +46,13 @@ namespace odev1.Migrations
                 principalColumn: "id",
                 onDelete: ReferentialAction.Cascade);
 
-            migrationBuilder.AddForeignKey(
+            /*migrationBuilder.AddForeignKey(
                 name: "FK_Trainers_AspNetUsers_userId",
                 table: "Trainers",
                 column: "userId",
                 principalTable: "AspNetUsers",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Cascade);*/
         }
 
         /// <inheritdoc />

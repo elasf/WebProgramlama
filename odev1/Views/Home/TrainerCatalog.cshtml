@@ -1,0 +1,89 @@
+﻿@model List<odev1.Models.Trainer>
+
+@{
+    ViewData["Title"] = "Eğitmen Kadromuz";
+}
+
+<div class="container py-5">
+
+    <div class="text-center mb-5">
+        <h2 class="fw-bold display-6">Uzman Eğitmenlerimiz</h2>
+        <p class="text-muted">Hedeflerinize ulaşmanız için yanınızdayız.</p>
+    </div>
+
+    <div class="row g-4">
+
+        @foreach (var trainer in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm hover-effect">
+
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center py-4">
+                        <i class="fas fa-user-circle text-secondary" style="font-size: 80px;"></i>
+                    </div>
+
+                    <div class="card-body text-center">
+                        <h5 class="card-title fw-bold text-dark">@trainer.fullName</h5>
+                        <p class="text-muted small mb-3">Profesyonel Antrenör</p>
+
+                        <div class="mb-2">
+                            <small class="d-block text-muted fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">UZMANLIKLAR</small>
+                            @if (trainer.trainerExpertises != null && trainer.trainerExpertises.Any())
+                            {
+                                foreach (var item in trainer.trainerExpertises)
+                                {
+                                    <span class="badge bg-primary bg-opacity-10 text-primary mb-1">
+                                        @item.expertise.expertise
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="badge bg-light text-muted">-</span>
+                            }
+                        </div>
+
+                        <div class="mb-4">
+                            <small class="d-block text-muted fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">HİZMETLER</small>
+                            @if (trainer.trainerServices != null && trainer.trainerServices.Any())
+                            {
+                                foreach (var item in trainer.trainerServices)
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success mb-1 border border-success border-opacity-25">
+                                        @item.service.name
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="badge bg-light text-muted">Hizmet Yok</span>
+                            }
+                        </div>
+
+                        <div class="d-grid mt-auto">
+                            <a asp-controller="Appointments"
+                               asp-action="Create"
+                               asp-route-trainerId="@trainer.id"
+                               class="btn btn-success rounded-pill btn-sm w-100 shadow-sm">
+                                <i class="fas fa-calendar-check me-1"></i> Randevu Al
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+<style>
+    .hover-effect {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .hover-effect:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        }
+</style>
